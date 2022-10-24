@@ -3,7 +3,7 @@ package tools.nexus.secure_tcp_socket;
 import lombok.extern.slf4j.Slf4j;
 import tools.nexus.secure_tcp_socket.common.FileSerializer;
 import tools.nexus.secure_tcp_socket.common.SyncObjOutputStream;
-import tools.nexus.secure_tcp_socket.dto.SecSocketMessage;
+import tools.nexus.secure_tcp_socket.dto.Message;
 import tools.nexus.secure_tcp_socket.dto.SecSocketMessageCmd;
 import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 
@@ -25,7 +25,7 @@ import java.util.Map;
  * - create keypair<br/>
  * - create symmetric key<br/>
  * - connect to the server<br/>
- * - send handshake {@link SecSocketMessage}s
+ * - send handshake {@link Message}s
  *
  * @author AndresE
  */
@@ -54,6 +54,7 @@ public class FortNoxServer {
      * - Sends the public key to the client
      */
     public void serverSendPublicKey1(SyncObjOutputStream trans, String keyPairLocation) {
+        log.debug("Entering serverSendPublicKey1...");
 
         PublicKey publicKey = null;
 
@@ -72,7 +73,7 @@ public class FortNoxServer {
 
         // Send public key to client
         // no hash?
-        SecSocketMessage m = new SecSocketMessage(SecSocketMessageCmd.putPubK);
+        Message m = new Message(SecSocketMessageCmd.putPubK);
         m.obj = publicKey;
 
         try {
@@ -82,9 +83,11 @@ public class FortNoxServer {
             log.error("Could not send public key", e);
             throw new SecureSocketTechnicalException(e.getMessage());
         }
+
+        log.debug("serverSendPublicKey1 DONE");
     }
 
-    private static KeyPair generateKeyPairCached(String asymType, int asymKeySize, String keyPairLocation) throws NoSuchAlgorithmException {
+    public static KeyPair generateKeyPairCached(String asymType, int asymKeySize, String keyPairLocation) throws NoSuchAlgorithmException {
 
         FileSerializer<KeyPair> fs = new FileSerializer<>(keyPairLocation);
         KeyPair kp = fs.getObj();
@@ -97,7 +100,7 @@ public class FortNoxServer {
         return kp;
     }
 
-    static KeyPair generateKeyPair(String asymType, int asymSize) throws NoSuchAlgorithmException {
+    public static KeyPair generateKeyPair(String asymType, int asymSize) throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(asymType);
 
         keyPairGenerator.initialize(asymSize);
@@ -112,6 +115,7 @@ public class FortNoxServer {
     public void asymmetricDecryptKey3(byte[] encryptedSymKey, SyncObjOutputStream objStream, Socket socket,
                                       Map<String, Object[]> keys,
                                       byte[] initVector) {
+        log.debug("Entering asymmetricDecryptKey3...");
 
         try {
             byte[] decryptedSymKeyBytes = decrypt(encryptedSymKey, cautionPrivateKey);
@@ -125,18 +129,18 @@ public class FortNoxServer {
             keys.put(clientName, keyWithVector);
 
             // Client waits for an answer
-            objStream.writeObject(new SecSocketMessage(SecSocketMessageCmd.ready));
+            objStream.writeObject(new Message(SecSocketMessageCmd.ready));
 
         } catch (IOException e) {
             throw new SecureSocketTechnicalException("Error while sending 'ready'", e);
         }
-
+        log.debug("asymmetricDecryptKey3 DONE");
     }
 
     /**
      * FortNox does only asymmetric.
      */
-    static byte[] decrypt(byte[] encryptedSymKey, PrivateKey cautionPrivateKey) {
+    public static byte[] decrypt(byte[] encryptedSymKey, PrivateKey cautionPrivateKey) {
         try {
             Cipher cipher = Cipher.getInstance(FortNoxClient.ENCR_DECR_OPTIONS);
             cipher.init(Cipher.DECRYPT_MODE, cautionPrivateKey);
@@ -157,7 +161,7 @@ public class FortNoxServer {
         return extractIp(addrAndPort);
     }
 
-    static String extractIp(String addrAndPort) {
+    public static String extractIp(String addrAndPort) {
         int index = addrAndPort.lastIndexOf(':');
         return addrAndPort.substring(1, index);
     }
@@ -166,7 +170,7 @@ public class FortNoxServer {
      * Creates new {@link SecureTcpSocket} - the encryption is always symmetric
      */
     @SuppressWarnings("java:S3329") // IV's should be random and unique
-    public static Socket createNewCipherSocket(Socket aClient, Object[] keyAndVector) {
+    public static Socket createSecureTcpSocket(Socket aClient, Object[] keyAndVector) {
         return SecureTcpSocket.of(aClient, FortNoxClient.SYMMETRIC_ALGORITHM,
                 (SecretKey) keyAndVector[0],
                 new IvParameterSpec((byte[]) keyAndVector[1]));

@@ -5,7 +5,7 @@
 
     <groupId>tools.nexus</groupId>
     <artifactId>secure-tcp-socket</artifactId>
-    <version>0.1-SNAPSHOT</version>
+    <version>0.1</version>
     <packaging>jar</packaging>
 
     <name>Secure tcp socket</name>

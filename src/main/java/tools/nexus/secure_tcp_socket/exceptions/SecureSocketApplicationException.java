@@ -1,8 +1,7 @@
 package tools.nexus.secure_tcp_socket.exceptions;
 
 /**
- * Fach- oder Businessfehler which is kind of expected
- * - does result in warning (errorhandler)
+ * Application or business exception which is kind of expected
  * - can / should be shown to the user
  */
 public class SecureSocketApplicationException extends Exception {

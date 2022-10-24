@@ -3,7 +3,7 @@ package tools.nexus.secure_tcp_socket;
 import lombok.extern.slf4j.Slf4j;
 import tools.nexus.secure_tcp_socket.common.ObjInputStream;
 import tools.nexus.secure_tcp_socket.common.SyncObjOutputStream;
-import tools.nexus.secure_tcp_socket.dto.SecSocketMessage;
+import tools.nexus.secure_tcp_socket.dto.Message;
 import tools.nexus.secure_tcp_socket.dto.SecSocketMessageCmd;
 import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 
@@ -70,43 +70,44 @@ public class FortNoxClient {
      * @return the cipher socket
      */
     public Socket setupSecureSocket2(String host, Socket oldSocket, SyncObjOutputStream trans) throws IOException {
+        log.debug("Entering setupSecureSocket2...");
 
-        SecSocketMessage m = new SecSocketMessage(SecSocketMessageCmd.getPubK);
+        Message m = new Message(SecSocketMessageCmd.getPubK);
 
         m.storedHash = m.hashCode();
         trans.writeObject(m);
 
         try {
             ObjInputStream read = new ObjInputStream(oldSocket.getInputStream());
-            SecSocketMessage inSecSocketMessage = (SecSocketMessage) read.readUnshared(); // blocking
+            Message inMessage = (Message) read.readUnshared(); // blocking
 
-            if (inSecSocketMessage.obj == null) {
+            if (inMessage.obj == null) {
                 throw new SecureSocketTechnicalException("Received NULL instead of public key from server");
             }
 
-            if (!inSecSocketMessage.command.equals(SecSocketMessageCmd.putPubK)) {
-                throw new SecureSocketTechnicalException("Received '" + inSecSocketMessage.command + "' instead of " + SecSocketMessageCmd.putPubK);
+            if (!inMessage.command.equals(SecSocketMessageCmd.putPubK)) {
+                throw new SecureSocketTechnicalException("Received '" + inMessage.command + "' instead of " + SecSocketMessageCmd.putPubK);
             }
 
             // Retrieve keys
-            PublicKey publicKey = (PublicKey) inSecSocketMessage.obj;
+            PublicKey publicKey = (PublicKey) inMessage.obj;
             publicKeyBytes = publicKey.getEncoded();
             Key symmetricKey = generateSymmetricKey(SYMMETRIC_TYPE, SYMMETRIC_KEY_SIZE);
 
             // Setup answer - key
-            SecSocketMessage encryptedAwSecSocketMessage = new SecSocketMessage(SecSocketMessageCmd.putEncSymKey);
-            encryptedAwSecSocketMessage.buffer = encrypt(symmetricKey.getEncoded(), publicKey);
+            Message encryptedAwMessage = new Message(SecSocketMessageCmd.putEncSymKey);
+            encryptedAwMessage.buffer = encrypt(symmetricKey.getEncoded(), publicKey);
 
             // add initVector (IvParameterSpec is not serializable)
             IvParameterSpec initVector = SecureTcpSocket.getInitVector(SYMMETRIC_TYPE);
-            encryptedAwSecSocketMessage.obj = initVector.getIV();
+            encryptedAwMessage.obj = initVector.getIV();
 
-            encryptedAwSecSocketMessage.storedHash = encryptedAwSecSocketMessage.hashCode();
-            trans.writeObject(encryptedAwSecSocketMessage);
+            encryptedAwMessage.storedHash = encryptedAwMessage.hashCode();
+            trans.writeObject(encryptedAwMessage);
 
             // Client has to wait for answer "READY"
-            inSecSocketMessage = (SecSocketMessage) read.readUnshared(); // blocks
-            if (inSecSocketMessage.command.equals(SecSocketMessageCmd.ready)) {
+            inMessage = (Message) read.readUnshared(); // blocks
+            if (inMessage.command.equals(SecSocketMessageCmd.ready)) {
                 log.info("Server stored my symmetric key");
             } else {
                 log.error("Server did NOT store my symmetric key");
@@ -116,7 +117,10 @@ public class FortNoxClient {
             // Get rid of old socket
             int port = oldSocket.getPort();
             oldSocket.close();
-            return setupCipherSocket(host, port, symmetricKey, initVector);
+
+            var result = setupSecureTcpSocket(host, port, symmetricKey, initVector);
+            log.debug("setupSecureSocket2 DONE");
+            return result;
 
         } catch (SocketException e) {
             if (e.getMessage().equals("Connection reset")) {
@@ -149,10 +153,7 @@ public class FortNoxClient {
         return keyGenerator.generateKey();
     }
 
-    /**
-     * Simplified creation of CipherSocket
-     */
-    private static Socket setupCipherSocket(String host, int port, Key symKey, IvParameterSpec initVector) throws IOException {
+    private static Socket setupSecureTcpSocket(String host, int port, Key symKey, IvParameterSpec initVector) throws IOException {
         return SecureTcpSocket.connect(host, port, SYMMETRIC_ALGORITHM,
                 (SecretKey) symKey,
                 initVector);
