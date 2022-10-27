@@ -48,12 +48,10 @@ public class FortNoxServer {
     PrivateKey cautionPrivateKey;
 
     /**
-     * NEW PARAM: String keyPairLocation = Cfg.getInst().getMountServerSYSTEM() + "keyPair.dat";
-     * <p>
      * Server: Generates an asymmetric key pair <br>
      * - Sends the public key to the client
      */
-    public void serverSendPublicKey1(SyncObjOutputStream trans, String keyPairLocation) {
+    public void action1sendPublicKey(SyncObjOutputStream trans, String keyPairLocation) {
         log.debug("Entering serverSendPublicKey1...");
 
         PublicKey publicKey = null;
@@ -112,9 +110,9 @@ public class FortNoxServer {
      * - stores it in key map <br>
      * - sends 'ready' to client
      */
-    public void asymmetricDecryptKey3(byte[] encryptedSymKey, SyncObjOutputStream objStream, Socket socket,
-                                      Map<String, Object[]> keys,
-                                      byte[] initVector) {
+    public void action3asymmetricDecryptKey(byte[] encryptedSymKey, SyncObjOutputStream objStream, Socket socket,
+                                            Map<String, Object[]> keys,
+                                            byte[] initVector) {
         log.debug("Entering asymmetricDecryptKey3...");
 
         try {

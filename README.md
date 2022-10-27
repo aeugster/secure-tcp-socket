@@ -2,8 +2,8 @@
 Create secure connections without requirement of certificates and key stores.
 
 ## Usage
-- Explore class FortNoxSever and use it in your server
-- Explore class FortNoxClient and use it in your client
+- Explore class FortNoxServer and use it in your server
+- Explore unitTest ExampleClientIT
 
 ## Changes and issues
 Please see: https://github.com/aeugster/secure-tcp-socket/issues

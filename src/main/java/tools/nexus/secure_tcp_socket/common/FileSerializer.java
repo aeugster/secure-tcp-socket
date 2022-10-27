@@ -45,7 +45,9 @@ public class FileSerializer<T> {
 
     public void writeObj(T obj) {
         try {
-            Files.createDirectories(pathToFile.getParent());
+            if (pathToFile.getParent() != null) {
+                Files.createDirectories(pathToFile.getParent());
+            }
 
             FileOutputStream fos = new FileOutputStream(pathToFile.toFile());
             ObjOutputStream oos = new ObjOutputStream(fos);
@@ -53,7 +55,7 @@ public class FileSerializer<T> {
             oos.writeUnshared(obj);
             oos.close();
         } catch (Exception e) {
-            throw new SecureSocketTechnicalException("Error while serializing object", e);
+            throw new SecureSocketTechnicalException("Error while writeObj: " + pathToFile, e);
         }
     }
 }

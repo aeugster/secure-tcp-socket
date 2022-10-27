@@ -69,7 +69,7 @@ public class FortNoxClient {
      * @param trans     established ObjOutputStream
      * @return the cipher socket
      */
-    public Socket setupSecureSocket2(String host, Socket oldSocket, SyncObjOutputStream trans) throws IOException {
+    public SecureTcpSocket setupSecureSocket2(String host, Socket oldSocket, SyncObjOutputStream trans) throws IOException {
         log.debug("Entering setupSecureSocket2...");
 
         Message m = new Message(SecSocketMessageCmd.getPubK);
@@ -118,7 +118,7 @@ public class FortNoxClient {
             int port = oldSocket.getPort();
             oldSocket.close();
 
-            var result = setupSecureTcpSocket(host, port, symmetricKey, initVector);
+            var result = SecureTcpSocket.connect(host, port, SYMMETRIC_ALGORITHM, (SecretKey) symmetricKey, initVector);
             log.debug("setupSecureSocket2 DONE");
             return result;
 
@@ -127,9 +127,9 @@ public class FortNoxClient {
                 throw new SecureSocketTechnicalException(
                         "Server did a reset on connection. Do you have the LATEST client downloaded? (DTO serialVersionUID)", e);
             }
-            throw new SecureSocketTechnicalException("General socket error occured", e);
+            throw new SecureSocketTechnicalException("General socket error occurred", e);
         } catch (GeneralSecurityException e) {
-            throw new SecureSocketTechnicalException("General encryption error occured", e);
+            throw new SecureSocketTechnicalException("General encryption error occurred", e);
         } catch (Exception e) {
             // TODO z Guideline: NPE does not provide message which could lead to another NPE :-P
             throw new SecureSocketTechnicalException("Client could not setup Cipher socket", e);
@@ -151,12 +151,6 @@ public class FortNoxClient {
         keyGenerator.init(symSize);
 
         return keyGenerator.generateKey();
-    }
-
-    private static Socket setupSecureTcpSocket(String host, int port, Key symKey, IvParameterSpec initVector) throws IOException {
-        return SecureTcpSocket.connect(host, port, SYMMETRIC_ALGORITHM,
-                (SecretKey) symKey,
-                initVector);
     }
 
     /**
