@@ -2,8 +2,8 @@ package tools.nexus.secure_tcp_socket.a_small_example;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tools.nexus.secure_tcp_socket.SecureTcpSocket;
 import tools.nexus.secure_tcp_socket.common.ObjInputStream;
+import tools.nexus.secure_tcp_socket.common.SecureTcpSocket;
 import tools.nexus.secure_tcp_socket.common.SyncObjOutputStream;
 import tools.nexus.secure_tcp_socket.dto.Message;
 

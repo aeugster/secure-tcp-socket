@@ -1,7 +1,7 @@
 package tools.nexus.secure_tcp_socket.a_small_example;
 
 import tools.nexus.secure_tcp_socket.FortNoxClient;
-import tools.nexus.secure_tcp_socket.SecureTcpSocket;
+import tools.nexus.secure_tcp_socket.common.SecureTcpSocket;
 import tools.nexus.secure_tcp_socket.common.SyncObjOutputStream;
 
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class ExampleClient {
         try (var connectedServer = new Socket(server, port)) {
 
             var fnClient = new FortNoxClient();
-            secureSocket = fnClient.setupSecureSocket2(server, connectedServer, new SyncObjOutputStream(connectedServer.getOutputStream()));
+            secureSocket = fnClient.action2setupSecureSocket(server, connectedServer, new SyncObjOutputStream(connectedServer.getOutputStream()));
         }
 
         return secureSocket;
