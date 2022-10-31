@@ -38,14 +38,13 @@ public class FortNoxClient {
     public static final String ENCR_DECR_OPTIONS = "RSA/ECB/OAEPWITHSHA-256ANDMGF1PADDING";
 
     /**
-     * Symmetric key algorithm .
+     * Symmetric key algorithm
      */
     public static final String SYMMETRIC_TYPE = "AES";
 
     public static final String SYMMETRIC_ALGORITHM = "AES/CTR/NoPadding";
 
-    public static final int SYMMETRIC_KEY_SIZE = 128; // 256; Out - Failed to init
-    // cipher: Illegal key size
+    public static final int SYMMETRIC_KEY_SIZE = 128;
 
     /**
      * Member variables

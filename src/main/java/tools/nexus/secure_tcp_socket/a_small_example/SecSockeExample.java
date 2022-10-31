@@ -1,6 +1,7 @@
 package tools.nexus.secure_tcp_socket.a_small_example;
 
 import lombok.extern.slf4j.Slf4j;
+import tools.nexus.secure_tcp_socket.dto.Message;
 
 import java.io.IOException;
 
@@ -12,19 +13,26 @@ import java.io.IOException;
 @Slf4j
 public class SecSockeExample {
 
+    /**
+     * productive server port
+     */
     public static final int PORT = 1234;
-    public static final String SERVER = "nexus.tools";
 
-    public static void main(String[] args) throws IOException {
+    public static final String SERVER = "localhost";
 
-        // TODO: create SERVER and start it
-        // var server = new ExampleServer(PORT)
-        // new Thread(server::runServer).start()
+    public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         // create client and run it
         var client = new ExampleClient(SERVER, PORT);
         client.run();
 
-        log.info("Client thread: Ended");
+        // use connection
+        client.getOutput().writeObject(Message.createListRequest());
+        Message message = (Message) client.getInput().readUnshared();
+        log(message.command + ": " + message.name);
+    }
+
+    static void log(String str) {
+        System.out.println(str);
     }
 }

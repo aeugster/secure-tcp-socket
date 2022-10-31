@@ -2,8 +2,8 @@
 Create secure connections without requirement of certificates and key stores.
 
 ## Usage
-- Explore class FortNoxServer and use it in your server
-- Explore unitTest ExampleClientIT
+- start ExampleServer and connect with SecSocketExample
+- Explore unitTest ExampleClientIT and connect to an existing server
 
 ## Changes and issues
 Please see: https://github.com/aeugster/secure-tcp-socket/issues
