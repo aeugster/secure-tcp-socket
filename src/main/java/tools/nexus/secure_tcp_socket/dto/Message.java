@@ -48,7 +48,7 @@ public class Message implements Serializable {
 		this.command = cmd;
 	}
 
-	public static Message getListRequest() {
+	public static Message createListRequest() {
 		return new Message(SecSocketMessageCmd.list);
 	}
 

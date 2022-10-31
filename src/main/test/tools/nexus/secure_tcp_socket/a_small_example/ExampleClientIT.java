@@ -2,9 +2,7 @@ package tools.nexus.secure_tcp_socket.a_small_example;
 
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
-import tools.nexus.secure_tcp_socket.common.ObjInputStream;
-import tools.nexus.secure_tcp_socket.common.SecureTcpSocket;
-import tools.nexus.secure_tcp_socket.common.SyncObjOutputStream;
+import org.junit.jupiter.api.Timeout;
 import tools.nexus.secure_tcp_socket.dto.Message;
 
 import java.io.IOException;
@@ -26,19 +24,20 @@ class ExampleClientIT {
      * - delete line where storedHash is updated and see how the server reacts
      */
     @Test
+    @Timeout(2)
     void testReceiveOfListing() throws IOException, ClassNotFoundException {
 
         // run client
         var client = new ExampleClient(SERVER_INTEGRATION, PORT);
-        SecureTcpSocket secureTcpSocket = client.run();
+        client.run();
 
         // send message
-        var request = Message.getListRequest();
+        var request = Message.createListRequest();
         request.storedHash = request.hashCode();
-        new SyncObjOutputStream(secureTcpSocket.getOutputStream()).writeObject(request);
+        client.getOutput().writeObject(request);
 
         // receive
-        var response = (Message) new ObjInputStream(secureTcpSocket.getInputStream()).readUnshared();
+        var response = (Message) client.getInput().readUnshared();
 
         // assert
         Assertions.assertNull(response.name, "An error occurs e.g. if storeHash is not set");
