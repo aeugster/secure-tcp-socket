@@ -2,6 +2,7 @@ package tools.nexus.secure_tcp_socket;
 
 import lombok.extern.slf4j.Slf4j;
 import tools.nexus.secure_tcp_socket.common.FileSerializer;
+import tools.nexus.secure_tcp_socket.common.SecureTcpSocket;
 import tools.nexus.secure_tcp_socket.common.SyncObjOutputStream;
 import tools.nexus.secure_tcp_socket.dto.Message;
 import tools.nexus.secure_tcp_socket.dto.SecSocketMessageCmd;

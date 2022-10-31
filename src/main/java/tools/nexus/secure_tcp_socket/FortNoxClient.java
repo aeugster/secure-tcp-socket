@@ -2,6 +2,7 @@ package tools.nexus.secure_tcp_socket;
 
 import lombok.extern.slf4j.Slf4j;
 import tools.nexus.secure_tcp_socket.common.ObjInputStream;
+import tools.nexus.secure_tcp_socket.common.SecureTcpSocket;
 import tools.nexus.secure_tcp_socket.common.SyncObjOutputStream;
 import tools.nexus.secure_tcp_socket.dto.Message;
 import tools.nexus.secure_tcp_socket.dto.SecSocketMessageCmd;
@@ -63,13 +64,13 @@ public class FortNoxClient {
      * - send encrypted key "putEncSymKey"<br>
      * - close socket and connect again<br>
      * <p>
-     * - TODO z feature zFatClient: Fortnox reconnect necessary?!
+     * - TODO z feature zFatClient: FortNox reconnect necessary?!
      *
      * @param oldSocket the old socket
      * @param trans     established ObjOutputStream
      * @return the cipher socket
      */
-    public SecureTcpSocket setupSecureSocket2(String host, Socket oldSocket, SyncObjOutputStream trans) throws IOException {
+    public SecureTcpSocket action2setupSecureSocket(String host, Socket oldSocket, SyncObjOutputStream trans) throws IOException {
         log.debug("Entering setupSecureSocket2...");
 
         Message m = new Message(SecSocketMessageCmd.getPubK);
@@ -131,7 +132,7 @@ public class FortNoxClient {
         } catch (GeneralSecurityException e) {
             throw new SecureSocketTechnicalException("General encryption error occurred", e);
         } catch (Exception e) {
-            // TODO z Guideline: NPE does not provide message which could lead to another NPE :-P
+            // NPE does not provide message which could lead to another NPE :-P
             throw new SecureSocketTechnicalException("Client could not setup Cipher socket", e);
         }
     }
