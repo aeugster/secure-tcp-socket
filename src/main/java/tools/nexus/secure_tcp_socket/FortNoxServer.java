@@ -154,12 +154,21 @@ public class FortNoxServer {
     }
 
     /**
+     * public: currently required for lib-user the-nexus
+     */
+    public boolean containsKey(String clientIdentification){
+        return HOLY_MAP_OF_KEYS.containsKey(clientIdentification);
+    }
+
+    /**
      * Returns a client identifier which might look like IP address of given socket
+     * <p>
+     * public: currently required for lib-user the-nexus
      *
      * @param socket the socket to be identified
      * @return a proprietary client identifier to use within a map
      */
-    static String getClientIdentification(Socket socket) {
+    public static String getClientIdentification(Socket socket) {
         // ipV4 pattern /127.0.0.1:50382
         // ipV4 vs host nexus.tools/85.217.171.26:1234   !!
         // ipV6 pattern: /0:0:0:0:0:0:0:1:51149
@@ -172,11 +181,15 @@ public class FortNoxServer {
     }
 
     @SuppressWarnings("java:S3329") // IV's should be random and unique
-    public Socket createSecureSocketViaIdentifier(Socket socket) {
+    public Socket createSecureSocketViaIdentifierRemoveKey(Socket socket) {
         String clientIdentification = getClientIdentification(socket);
 
-        return SecureTcpSocket.of(socket, FortNoxClient.SYMMETRIC_ALGORITHM,
+        var result = SecureTcpSocket.of(socket, FortNoxClient.SYMMETRIC_ALGORITHM,
                 (SecretKey) HOLY_MAP_OF_KEYS.get(clientIdentification)[0],
                 new IvParameterSpec((byte[]) HOLY_MAP_OF_KEYS.get(clientIdentification)[1]));
+
+        HOLY_MAP_OF_KEYS.remove(clientIdentification);
+
+        return result;
     }
 }

@@ -63,7 +63,7 @@ public class ExampleServer {
 
     @SuppressWarnings("java:S3329") // IV is dynamical
     private void acceptAndSecureConnection(ServerSocket serverSocket, FortNoxServer fnServer) throws IOException, ClassNotFoundException {
-        Socket connectedClient = fnServer.createSecureSocketViaIdentifier(serverSocket.accept());
+        Socket connectedClient = fnServer.createSecureSocketViaIdentifierRemoveKey(serverSocket.accept());
 
         // drop clients 'list'
         Message message = (Message) new ObjInputStream(connectedClient.getInputStream()).readUnshared();
