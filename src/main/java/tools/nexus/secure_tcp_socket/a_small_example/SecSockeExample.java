@@ -8,7 +8,7 @@ import java.io.IOException;
 /**
  * Example with client / server
  * <p>
- * - Remove <scope>test</scope> in pom.xml to have comments printed
+ * - Remove <scope>test</scope> in pom.xml to have log statements printed
  */
 @Slf4j
 public class SecSockeExample {
@@ -24,12 +24,12 @@ public class SecSockeExample {
 
         // create client and run it
         var client = new ExampleClient(SERVER, PORT);
-        client.run();
+        client.connectToServer();
 
         // use connection
         client.getOutput().writeObject(Message.createListRequest());
         Message message = (Message) client.getInput().readUnshared();
-        log(message.command + ": " + message.name);
+        log(message.command + " message received: " + message.name);
     }
 
     static void log(String str) {

@@ -46,9 +46,6 @@ public class FortNoxClient {
 
     public static final int SYMMETRIC_KEY_SIZE = 128;
 
-    /**
-     * Member variables
-     */
     private byte[] publicKeyBytes;
 
     public byte[] getPublicKeyBytes() {
@@ -65,6 +62,7 @@ public class FortNoxClient {
      * <p>
      * - TODO z feature zFatClient: FortNox reconnect necessary?!
      *
+     * @param host      the host, since information in socket is hard to read
      * @param oldSocket the old socket
      * @param trans     established ObjOutputStream
      * @return the cipher socket
@@ -142,7 +140,7 @@ public class FortNoxClient {
      * @param symType type required for testing purpose
      * @return the symmetric key
      */
-    public static Key generateSymmetricKey(String symType, int symSize) throws NoSuchAlgorithmException {
+    static Key generateSymmetricKey(String symType, int symSize) throws NoSuchAlgorithmException {
         KeyGenerator keyGenerator = KeyGenerator.getInstance(symType);
 
         // If this key generator requires any random bytes, it will get them
@@ -156,7 +154,7 @@ public class FortNoxClient {
     /**
      * FortNox does only asymmetric.
      */
-    public static byte[] encrypt(byte[] symmetric, PublicKey publicKey) throws GeneralSecurityException {
+    static byte[] encrypt(byte[] symmetric, PublicKey publicKey) throws GeneralSecurityException {
         Cipher cipher = Cipher.getInstance(ENCR_DECR_OPTIONS /*, provider*/);
 
         cipher.init(Cipher.ENCRYPT_MODE, publicKey);
