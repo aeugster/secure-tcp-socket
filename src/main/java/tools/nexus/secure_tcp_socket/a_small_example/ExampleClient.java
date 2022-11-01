@@ -25,10 +25,13 @@ public class ExampleClient {
         this.port = port;
     }
 
-    public void run() throws IOException {
+    public void connectToServer() throws IOException {
         SecureTcpSocket secureSocket;
         try (var connectedServer = new Socket(server, port)) {
 
+            /*
+             * use ForNoxClient to retrieve secure connection
+             */
             var fnClient = new FortNoxClient();
             secureSocket = fnClient.action2setupSecureSocket(server, connectedServer, new SyncObjOutputStream(connectedServer.getOutputStream()));
         }

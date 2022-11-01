@@ -29,7 +29,7 @@ class ExampleClientIT {
 
         // run client
         var client = new ExampleClient(SERVER_INTEGRATION, PORT);
-        client.run();
+        client.connectToServer();
 
         // send message
         var request = Message.createListRequest();

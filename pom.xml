@@ -5,7 +5,7 @@
 
     <groupId>tools.nexus</groupId>
     <artifactId>secure-tcp-socket</artifactId>
-    <version>0.2-SNAPSHOT</version>
+    <version>0.2</version>
     <packaging>jar</packaging>
 
     <name>Secure tcp socket</name>
@@ -51,6 +51,18 @@
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
             <version>${junit.jupiter.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.23.1</version>
             <scope>test</scope>
         </dependency>
     </dependencies>

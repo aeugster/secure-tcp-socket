@@ -14,7 +14,9 @@ import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.net.Socket;
+import java.net.SocketAddress;
 import java.security.*;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -32,6 +34,8 @@ import java.util.Map;
  */
 @Slf4j
 public class FortNoxServer {
+
+    private static final Map<String, Object[]> HOLY_MAP_OF_KEYS = new HashMap<>();
 
     /**
      * Asymmetric key algorithm
@@ -86,7 +90,7 @@ public class FortNoxServer {
         log.debug("serverSendPublicKey1 DONE");
     }
 
-    public static KeyPair generateKeyPairCached(String asymType, int asymKeySize, String keyPairLocation) throws NoSuchAlgorithmException {
+    static KeyPair generateKeyPairCached(String asymType, int asymKeySize, String keyPairLocation) throws NoSuchAlgorithmException {
 
         FileSerializer<KeyPair> fs = new FileSerializer<>(keyPairLocation);
         KeyPair kp = fs.getObj();
@@ -99,7 +103,7 @@ public class FortNoxServer {
         return kp;
     }
 
-    public static KeyPair generateKeyPair(String asymType, int asymSize) throws NoSuchAlgorithmException {
+    static KeyPair generateKeyPair(String asymType, int asymSize) throws NoSuchAlgorithmException {
         KeyPairGenerator keyPairGenerator = KeyPairGenerator.getInstance(asymType);
 
         keyPairGenerator.initialize(asymSize);
@@ -112,7 +116,6 @@ public class FortNoxServer {
      * - sends 'ready' to client
      */
     public void action3asymmetricDecryptKey(byte[] encryptedSymKey, SyncObjOutputStream objStream, Socket socket,
-                                            Map<String, Object[]> keys,
                                             byte[] initVector) {
         log.debug("Entering asymmetricDecryptKey3...");
 
@@ -120,12 +123,12 @@ public class FortNoxServer {
             byte[] decryptedSymKeyBytes = decrypt(encryptedSymKey, cautionPrivateKey);
             SecretKey sk = new SecretKeySpec(decryptedSymKeyBytes, FortNoxClient.SYMMETRIC_TYPE);
 
-            String clientName = FortNoxServer.getClientHost(socket);
+            String clientName = FortNoxServer.getClientIdentification(socket);
             log.info("PUT key in map for: '" + clientName + "'");
 
             // Make server ready
             Object[] keyWithVector = {sk, initVector};
-            keys.put(clientName, keyWithVector);
+            HOLY_MAP_OF_KEYS.put(clientName, keyWithVector);
 
             // Client waits for an answer
             objStream.writeObject(new Message(SecSocketMessageCmd.ready));
@@ -139,7 +142,7 @@ public class FortNoxServer {
     /**
      * FortNox does only asymmetric.
      */
-    public static byte[] decrypt(byte[] encryptedSymKey, PrivateKey cautionPrivateKey) {
+    static byte[] decrypt(byte[] encryptedSymKey, PrivateKey cautionPrivateKey) {
         try {
             Cipher cipher = Cipher.getInstance(FortNoxClient.ENCR_DECR_OPTIONS);
             cipher.init(Cipher.DECRYPT_MODE, cautionPrivateKey);
@@ -151,27 +154,42 @@ public class FortNoxServer {
     }
 
     /**
-     * Extracts the IP address out of given socket
+     * public: currently required for lib-user the-nexus
      */
-    public static String getClientHost(Socket socket) {
-        // ipV4 pattern /127.0.0.1:50382
-        // ipV6 pattern: /0:0:0:0:0:0:0:1:51149
-        String addrAndPort = socket.getRemoteSocketAddress().toString();
-        return extractIp(addrAndPort);
-    }
-
-    public static String extractIp(String addrAndPort) {
-        int index = addrAndPort.lastIndexOf(':');
-        return addrAndPort.substring(1, index);
+    public boolean containsKey(String clientIdentification){
+        return HOLY_MAP_OF_KEYS.containsKey(clientIdentification);
     }
 
     /**
-     * Creates new {@link SecureTcpSocket} - the encryption is always symmetric
+     * Returns a client identifier which might look like IP address of given socket
+     * <p>
+     * public: currently required for lib-user the-nexus
+     *
+     * @param socket the socket to be identified
+     * @return a proprietary client identifier to use within a map
      */
+    public static String getClientIdentification(Socket socket) {
+        // ipV4 pattern /127.0.0.1:50382
+        // ipV4 vs host nexus.tools/85.217.171.26:1234   !!
+        // ipV6 pattern: /0:0:0:0:0:0:0:1:51149
+        SocketAddress addrAndPort = socket.getRemoteSocketAddress();
+
+        // extract ip, Caution: a SocketAddress with domain name leads to unexpected result
+        String strAddrAndPort = addrAndPort.toString();
+        int index = strAddrAndPort.lastIndexOf(':');
+        return strAddrAndPort.substring(1, index);
+    }
+
     @SuppressWarnings("java:S3329") // IV's should be random and unique
-    public static Socket createSecureTcpSocket(Socket aClient, Object[] keyAndVector) {
-        return SecureTcpSocket.of(aClient, FortNoxClient.SYMMETRIC_ALGORITHM,
-                (SecretKey) keyAndVector[0],
-                new IvParameterSpec((byte[]) keyAndVector[1]));
+    public Socket createSecureSocketViaIdentifierRemoveKey(Socket socket) {
+        String clientIdentification = getClientIdentification(socket);
+
+        var result = SecureTcpSocket.of(socket, FortNoxClient.SYMMETRIC_ALGORITHM,
+                (SecretKey) HOLY_MAP_OF_KEYS.get(clientIdentification)[0],
+                new IvParameterSpec((byte[]) HOLY_MAP_OF_KEYS.get(clientIdentification)[1]));
+
+        HOLY_MAP_OF_KEYS.remove(clientIdentification);
+
+        return result;
     }
 }
