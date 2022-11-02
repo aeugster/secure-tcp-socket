@@ -60,7 +60,8 @@ public class FortNoxClient {
      * - send encrypted key "putEncSymKey"<br>
      * - close socket and connect again<br>
      * <p>
-     * - TODO z feature zFatClient: FortNox reconnect necessary?!
+     *
+     * <a href="https://github.com/aeugster/secure-tcp-socket/issues/6">Feature: no reconnect</a>
      *
      * @param host      the host, since information in socket is hard to read
      * @param oldSocket the old socket

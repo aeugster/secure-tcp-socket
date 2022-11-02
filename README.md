@@ -5,8 +5,10 @@ Create secure connections without requirement of certificates and key stores.
 - start ExampleServer and connect with SecSocketExample
 - Explore unitTest ExampleClientIT and connect to an existing server
 
-## Changes and issues
-Please see: https://github.com/aeugster/secure-tcp-socket/issues
+## Issues and Sonar
+Issues: https://github.com/aeugster/secure-tcp-socket/issues
+
+Sonar: https://sonarcloud.io/summary/overall?id=aeugster_secure-tcp-socket
 
 ## Exceptions
 - TechnicalExceptions are thrown for unexpected errors
