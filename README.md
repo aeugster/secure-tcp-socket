@@ -17,6 +17,9 @@ Sonar: https://sonarcloud.io/summary/overall?id=aeugster_secure-tcp-socket
 
 ## Misc
 
+### Trigger sonar manually (login required)
+https://sonarcloud.io/project/analysis_method?id=aeugster_secure-tcp-socket
+
 ### Formatting
 - use intellij defaults
 
