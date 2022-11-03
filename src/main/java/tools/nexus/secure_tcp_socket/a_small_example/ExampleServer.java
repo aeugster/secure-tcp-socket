@@ -1,5 +1,6 @@
 package tools.nexus.secure_tcp_socket.a_small_example;
 
+import lombok.extern.slf4j.Slf4j;
 import tools.nexus.secure_tcp_socket.FortNoxServer;
 import tools.nexus.secure_tcp_socket.common.ObjInputStream;
 import tools.nexus.secure_tcp_socket.common.ObjOutputStream;
@@ -13,6 +14,7 @@ import java.net.Socket;
 /**
  * Expects a fixed serie of messages (because it's an example server)
  */
+@Slf4j
 public class ExampleServer {
 
     private final ServerSocket serverSocket;
@@ -63,16 +65,17 @@ public class ExampleServer {
 
     @SuppressWarnings("java:S3329") // IV is dynamical
     private void acceptAndSecureConnection(ServerSocket serverSocket, FortNoxServer fnServer) throws IOException, ClassNotFoundException {
-        Socket connectedClient = fnServer.createSecureSocketViaIdentifierRemoveKey(serverSocket.accept());
+        try (Socket connectedClient = fnServer.createSecureSocketViaIdentifierRemoveKey(serverSocket.accept())) {
 
-        // drop clients 'list'
-        Message message = (Message) new ObjInputStream(connectedClient.getInputStream()).readUnshared();
-        log("Server reacting to: " + message.command);
+            // drop clients 'list'
+            Message message = (Message) new ObjInputStream(connectedClient.getInputStream()).readUnshared();
+            log("Server reacting to: " + message.command);
 
-        Message m = Message.createListRequest();
-        m.name = "helloWorld.txt, helloWorld.png, helloWorld.jpg";
-        new ObjOutputStream(connectedClient.getOutputStream()).writeUnshared(m);
-        log(m.command + " message sent");
+            Message m = Message.createListRequest();
+            m.name = "helloWorld.txt, helloWorld.png, helloWorld.jpg";
+            new ObjOutputStream(connectedClient.getOutputStream()).writeUnshared(m);
+            log(m.command + " message sent");
+        }
     }
 
     void log(String str) {
