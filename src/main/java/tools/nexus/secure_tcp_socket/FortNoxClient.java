@@ -136,8 +136,6 @@ public class FortNoxClient {
     }
 
     /**
-     * Internal method, public for testing
-     *
      * @param symType type required for testing purpose
      * @return the symmetric key
      */
