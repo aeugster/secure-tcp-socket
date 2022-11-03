@@ -27,7 +27,7 @@ import java.util.List;
 @RunWith(Parameterized.class)
 class SecureTcpSocketTest {
 
-    private static final boolean addExperimentalBlowfish = false;
+    private static final boolean ADD_EXPERIMENTAL_BLOWFISH = false;
     private static final String NONE = "none";
 
     /**
@@ -45,9 +45,9 @@ class SecureTcpSocketTest {
     /**
      * Parameters
      */
-    private final String SYM_TYPE;
-    private final String SYM_ALGORITHM;
-    private final boolean SKIP_IV;
+    private final String symmetricType;
+    private final String symmetricAlgorithm;
+    private final boolean skipIv;
 
     /**
      * First, setup params
@@ -61,7 +61,7 @@ class SecureTcpSocketTest {
                 {"ARCFOUR", "ARCFOUR" /*           */, true}, //
                 {"Blowfish", "Blowfish/CTR/NoPadding", false}}));
 
-        if (addExperimentalBlowfish) {
+        if (ADD_EXPERIMENTAL_BLOWFISH) {
             // sendTwoBytes and send10Bytes fail cause of ECB
             params.add((new Object[]{"Blowfish", "Blowfish/ECB/PKCS5Padding", false, true}));
         }
@@ -73,13 +73,13 @@ class SecureTcpSocketTest {
      * Second, the params are provided
      */
     public SecureTcpSocketTest(String type, String algo, boolean skipIV) {
-        SYM_TYPE = type;
-        SYM_ALGORITHM = algo;
-        SKIP_IV = skipIV;
+        symmetricType = type;
+        symmetricAlgorithm = algo;
+        skipIv = skipIV;
     }
 
     private boolean isCipher() {
-        return !SYM_TYPE.equals(NONE);
+        return !symmetricType.equals(NONE);
     }
 
     /**
@@ -101,17 +101,17 @@ class SecureTcpSocketTest {
     }
 
     private void setupCipherSocket() throws NoSuchAlgorithmException, IOException {
-        SecretKey secKey = (SecretKey) FortNoxClient.generateSymmetricKey(SYM_TYPE, FortNoxClient.SYMMETRIC_KEY_SIZE);
+        SecretKey secKey = (SecretKey) FortNoxClient.generateSymmetricKey(symmetricType, FortNoxClient.SYMMETRIC_KEY_SIZE);
 
         @SuppressWarnings("resource") // wrappee is closed during tear down
-        SecureTcpSocket aCypherSocket = SecureTcpSocket.of(clientSocket, SYM_ALGORITHM, secKey,
-                getInitVectorForTesting(SYM_ALGORITHM));
-        aCypherSocket.skipIv(SKIP_IV);
+        SecureTcpSocket aCypherSocket = SecureTcpSocket.of(clientSocket, symmetricAlgorithm, secKey,
+                getInitVectorForTesting(symmetricAlgorithm));
+        aCypherSocket.skipIv(skipIv);
         input = aCypherSocket.getInputStream();
 
-        aCypherSocket = SecureTcpSocket.of(serverSideSocket, SYM_ALGORITHM, secKey,
-                getInitVectorForTesting(SYM_ALGORITHM));
-        aCypherSocket.skipIv(SKIP_IV);
+        aCypherSocket = SecureTcpSocket.of(serverSideSocket, symmetricAlgorithm, secKey,
+                getInitVectorForTesting(symmetricAlgorithm));
+        aCypherSocket.skipIv(skipIv);
         output = aCypherSocket.getOutputStream();
     }
 
