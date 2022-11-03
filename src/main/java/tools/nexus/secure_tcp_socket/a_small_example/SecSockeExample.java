@@ -20,7 +20,12 @@ public class SecSockeExample {
 
     public static final String SERVER = "localhost";
 
+    private static Message testFlagReceivedMessage;
+
     public static void main(String[] args) throws IOException, ClassNotFoundException {
+
+        // start server
+        new Thread(() -> ExampleServer.main(null)).start();
 
         // create client and run it
         var client = new ExampleClient(SERVER, PORT);
@@ -30,9 +35,15 @@ public class SecSockeExample {
         client.getOutput().writeObject(Message.createListRequest());
         Message message = (Message) client.getInput().readUnshared();
         log(message.command + " message received: " + message.name);
+
+        testFlagReceivedMessage = message;
     }
 
     static void log(String str) {
         System.out.println(str);
+    }
+
+    static Message getTestFlagReceivedMessage() {
+        return testFlagReceivedMessage;
     }
 }

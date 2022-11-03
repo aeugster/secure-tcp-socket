@@ -6,6 +6,7 @@ import tools.nexus.secure_tcp_socket.common.ObjInputStream;
 import tools.nexus.secure_tcp_socket.common.ObjOutputStream;
 import tools.nexus.secure_tcp_socket.common.SyncObjOutputStream;
 import tools.nexus.secure_tcp_socket.dto.Message;
+import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -17,6 +18,8 @@ import java.net.Socket;
 @Slf4j
 public class ExampleServer {
 
+    private static boolean testFlagDidListen;
+
     private final ServerSocket serverSocket;
 
     public ExampleServer(ServerSocket serverSocket) {
@@ -24,16 +27,26 @@ public class ExampleServer {
     }
 
     @SuppressWarnings("java:S2189") // infinite loops
-    public static void main(String[] args) throws IOException {
-        var server = new ExampleServer(new ServerSocket(SecSockeExample.PORT));
+    public static void main(String[] args) {
+        ExampleServer server = null;
+        try {
+            server = new ExampleServer(new ServerSocket(SecSockeExample.PORT));
+            ExampleServer.testFlagDidListen = true;
+        } catch (IOException e) {
+            throw new SecureSocketTechnicalException(e.getMessage());
+        }
 
         while (true) {
             try {
                 server.runServer();
             } catch (Exception e) {
-                e.printStackTrace();
+                throw new SecureSocketTechnicalException(e.getMessage());
             }
         }
+    }
+
+    public static boolean isTestFlagDidListen() {
+        return testFlagDidListen;
     }
 
     void runServer() throws IOException, ClassNotFoundException {
