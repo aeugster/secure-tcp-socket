@@ -26,15 +26,20 @@ public class ExampleServer {
         this.serverSocket = serverSocket;
     }
 
-    @SuppressWarnings("java:S2189") // infinite loops
-    public static void main(String[] args) {
-        ExampleServer server = null;
-        try {
-            server = new ExampleServer(new ServerSocket(SecSockeExample.PORT));
-            ExampleServer.testFlagDidListen = true;
-        } catch (IOException e) {
-            throw new SecureSocketTechnicalException(e.getMessage());
+    /**
+     * use for manual start
+     */
+    @SuppressWarnings("java:S2189") // no infinite loops
+    public static void main(String[] args) throws IOException {
+        var port = SecSockeExample.PORT;
+        if (args != null && args.length > 0) {
+            port = Integer.parseInt(args[0]);
         }
+
+        var serverSocket = new ServerSocket(port);
+
+        ExampleServer server = new ExampleServer(serverSocket);
+        ExampleServer.testFlagDidListen = true;
 
         while (true) {
             try {
