@@ -26,14 +26,23 @@ public class ExampleServer {
         this.serverSocket = serverSocket;
     }
 
+    private static boolean doWhile = true;
+
     /**
      * use for manual start
      */
     @SuppressWarnings("java:S2189") // no infinite loops
     public static void main(String[] args) throws IOException {
         var port = SecSocketExample.PORT;
-        if (args != null && args.length > 0) {
-            port = Integer.parseInt(args[0]);
+        var once = false;
+
+        if (args != null) {
+            if (args.length > 0 && !args[0].equals("p")) {
+                port = Integer.parseInt(args[0]);
+            }
+            if (args.length > 1 && args[1].equals("once")) {
+                once = true;
+            }
         }
 
         var serverSocket = new ServerSocket(port);
@@ -41,7 +50,11 @@ public class ExampleServer {
         ExampleServer server = new ExampleServer(serverSocket);
         ExampleServer.testFlagDidListen = true;
 
-        while (true) {
+        while (doWhile) {
+            if (once) {
+                doWhile = false;
+            }
+
             try {
                 server.runServer();
             } catch (Exception e) {
