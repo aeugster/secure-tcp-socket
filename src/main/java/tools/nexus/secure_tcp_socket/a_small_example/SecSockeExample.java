@@ -32,6 +32,9 @@ public class SecSockeExample {
         var t1 = new Thread(() -> SecSockeExample.runServer(args));
         t1.start();
 
+        // await listening of server (don't wait or sleep in your productive code)
+        WaitUtil.waitMillis(1000, ExampleServer::isTestFlagDidListen);
+
         // create client and run it
         var client = new ExampleClient(SERVER, PORT);
         client.connectToServer();
