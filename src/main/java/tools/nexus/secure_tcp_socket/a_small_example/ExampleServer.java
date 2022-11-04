@@ -31,7 +31,7 @@ public class ExampleServer {
      */
     @SuppressWarnings("java:S2189") // no infinite loops
     public static void main(String[] args) throws IOException {
-        var port = SecSockeExample.PORT;
+        var port = SecSocketExample.PORT;
         if (args != null && args.length > 0) {
             port = Integer.parseInt(args[0]);
         }
