@@ -1,10 +1,13 @@
-package tools.nexus.secure_tcp_socket.a_small_example;
+package tools.nexus.secure_tcp_socket.common;
 
 import java.util.function.BooleanSupplier;
 
-public class WaitUtil {
+/**
+ * Please use with care or for example code
+ */
+public class DeprecatedWaitUtil {
 
-    private WaitUtil() {
+    private DeprecatedWaitUtil() {
     }
 
     public static void waitMillis(final int millis, BooleanSupplier waitFor) {

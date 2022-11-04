@@ -1,6 +1,7 @@
 package tools.nexus.secure_tcp_socket.a_small_example;
 
 import lombok.extern.slf4j.Slf4j;
+import tools.nexus.secure_tcp_socket.common.DeprecatedWaitUtil;
 import tools.nexus.secure_tcp_socket.dto.Message;
 import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 
@@ -33,7 +34,7 @@ public class SecSockeExample {
         t1.start();
 
         // await listening of server (don't wait or sleep in your productive code)
-        WaitUtil.waitMillis(1000, ExampleServer::isTestFlagDidListen);
+        DeprecatedWaitUtil.waitMillis(1000, ExampleServer::isTestFlagDidListen);
 
         // create client and run it
         var client = new ExampleClient(SERVER, PORT);
