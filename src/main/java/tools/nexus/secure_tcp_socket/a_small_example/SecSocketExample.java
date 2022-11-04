@@ -56,6 +56,7 @@ public class SecSocketExample {
         }
     }
 
+    @SuppressWarnings("java:S106") // avoid std out
     static void log(String str) {
         System.out.println(str);
     }

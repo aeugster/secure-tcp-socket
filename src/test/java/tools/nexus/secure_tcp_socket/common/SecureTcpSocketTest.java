@@ -1,12 +1,18 @@
 package tools.nexus.secure_tcp_socket.common;
 
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Timeout;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import tools.nexus.secure_tcp_socket.FortNoxClient;
 import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
 import javax.crypto.spec.IvParameterSpec;
+import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,20 +20,16 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
 import java.security.NoSuchAlgorithmException;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
-import java.util.List;
+import java.util.stream.Stream;
 
 /**
- * Test CipherSocket: Left connects to right and sends data.
+ * Left connects to right and sends data.
  *
  * @author AndresE
  */
-@RunWith(Parameterized.class)
 class SecureTcpSocketTest {
 
-    private static final boolean ADD_EXPERIMENTAL_BLOWFISH = false;
     private static final String NONE = "none";
 
     /**
@@ -45,48 +47,37 @@ class SecureTcpSocketTest {
     /**
      * Parameters
      */
-    private final String symmetricType;
-    private final String symmetricAlgorithm;
-    private final boolean skipIv;
+    private String symmetricType;
+    private String symmetricAlgorithm;
+    private boolean skipIv;
 
     /**
-     * First, setup params
+     * parameter (method) source
      */
-    @Parameters(name = "{1}-encryption")
-    public static Collection<Object[]> params() {
+    private static Stream<Arguments> provideParameters() {
+        return Stream.of(
+                // sendTwoBytes and send10Bytes fail cause of ECB
+                // Junit5 issue? timeout does not work here (when skipIV change to true :-/
+                // Arguments.of("Blowfish", "Blowfish/ECB/PKCS5Padding", false, true),
 
-        List<Object[]> params = new ArrayList<Object[]>(Arrays.asList(new Object[][]{ //
-                {NONE, NONE /*                     */, false /* skip IV */}, //
-                {"AES", "AES/CTR/NoPadding" /*     */, false}, //
-                {"ARCFOUR", "ARCFOUR" /*           */, true}, //
-                {"Blowfish", "Blowfish/CTR/NoPadding", false}}));
-
-        if (ADD_EXPERIMENTAL_BLOWFISH) {
-            // sendTwoBytes and send10Bytes fail cause of ECB
-            params.add((new Object[]{"Blowfish", "Blowfish/ECB/PKCS5Padding", false, true}));
-        }
-
-        return params;
-    }
-
-    /**
-     * Second, the params are provided
-     */
-    public SecureTcpSocketTest(String type, String algo, boolean skipIV) {
-        symmetricType = type;
-        symmetricAlgorithm = algo;
-        skipIv = skipIV;
+                Arguments.of(NONE, NONE /*                     */, false /* skip IV */),
+                Arguments.of("AES", "AES/CTR/NoPadding" /*     */, false),
+                Arguments.of("ARCFOUR", "ARCFOUR" /*           */, true),
+                Arguments.of("Blowfish", "Blowfish/CTR/NoPadding", false)
+        );
     }
 
     private boolean isCipher() {
         return !symmetricType.equals(NONE);
     }
 
-    /**
-     * Third, setup based on params
-     */
-    @BeforeEach
-    public void setUp() throws Exception {
+    // @BeforeEach would be too early because params come afterwards :-/
+    private void initAndSetup(String type, String algo, boolean skipIv) throws Exception {
+        this.symmetricType = type;
+        this.symmetricAlgorithm = algo;
+        this.skipIv = skipIv;
+
+        // setup
         ServerSocket serverSocket = new ServerSocket(12345);
 
         clientSocket = new Socket("localhost", 12345);
@@ -101,9 +92,8 @@ class SecureTcpSocketTest {
     }
 
     private void setupCipherSocket() throws NoSuchAlgorithmException, IOException {
-        SecretKey secKey = (SecretKey) FortNoxClient.generateSymmetricKey(symmetricType, FortNoxClient.SYMMETRIC_KEY_SIZE);
+        SecretKey secKey = getSymmetricTestingKey(symmetricType, FortNoxClient.SYMMETRIC_KEY_SIZE);
 
-        @SuppressWarnings("resource") // wrappee is closed during tear down
         SecureTcpSocket aCypherSocket = SecureTcpSocket.of(clientSocket, symmetricAlgorithm, secKey,
                 getInitVectorForTesting(symmetricAlgorithm));
         aCypherSocket.skipIv(skipIv);
@@ -115,14 +105,41 @@ class SecureTcpSocketTest {
         output = aCypherSocket.getOutputStream();
     }
 
+    private SecretKey getSymmetricTestingKey(String symmetricType, int symmetricKeySize) {
+        if (symmetricKeySize != 128) {
+            return null;
+        }
+
+        byte[] bytes;
+
+        switch (symmetricType) {
+            case "AES":
+                bytes = new byte[]{46, 58, 80, 29, -119, 50, -1, -86, 29, 114, -75, 44, -2, 69, 74, -77};
+                break;
+            case "ARCFOUR":
+                bytes = new byte[]{106, -82, -15, 44, 13, 87, 103, 50, -127, 82, -83, 114, -25, 10, -36, -92};
+                break;
+            case "Blowfish":
+                bytes = new byte[]{-18, 14, -8, 4, 32, -114, -30, 33, 41, 112, 1, -107, 77, -123, 73, -26};
+                break;
+            default:
+                return null;
+        }
+
+        return new SecretKeySpec(bytes, symmetricType);
+    }
+
     private void setupBaseSocket() throws IOException {
         output = clientSocket.getOutputStream();
         input = serverSideSocket.getInputStream();
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("provideParameters")
     @Timeout(1)
-    void testTwoSingleBytes() throws IOException {
+    void testTwoSingleBytes(String type, String algo, boolean skipIV) throws Exception {
+        initAndSetup(type, algo, skipIV);
+
         output.write("x".getBytes(StandardCharsets.UTF_8));
         output.write("y".getBytes(StandardCharsets.UTF_8));
 
@@ -131,9 +148,13 @@ class SecureTcpSocketTest {
         Assertions.assertArrayEquals(new byte[]{120, 121, 0, 0}, array);
     }
 
-    @Test
+
+    @ParameterizedTest
+    @MethodSource("provideParameters")
     @Timeout(1)
-    void testSend10Bytes() throws IOException {
+    void testSend10Bytes(String type, String algo, boolean skipIV) throws Exception {
+        initAndSetup(type, algo, skipIV);
+
         output.write(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
         byte[] array = new byte[12];
@@ -142,9 +163,12 @@ class SecureTcpSocketTest {
         Assertions.assertArrayEquals(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 0, 0}, array);
     }
 
-    @Test
+    @ParameterizedTest
+    @MethodSource("provideParameters")
     @Timeout(2)
-    void testSend10kiloBytes() throws IOException {
+    void testSend10kiloBytes(String type, String algo, boolean skipIV) throws Exception {
+        initAndSetup(type, algo, skipIV);
+
         int size = 10000;
         byte[] tmp = new byte[size];
 
