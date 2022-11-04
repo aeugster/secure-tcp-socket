@@ -96,6 +96,7 @@ public class ExampleServer {
         }
     }
 
+    @SuppressWarnings("java:S106") // avoid std out
     void log(String str) {
         System.out.println(str);
     }
