@@ -13,7 +13,7 @@ import java.io.IOException;
  * - Remove <scope>test</scope> in pom.xml to have log statements printed
  */
 @Slf4j
-public class SecSockeExample {
+public class SecSocketExample {
 
     /**
      * productive server port
@@ -30,7 +30,7 @@ public class SecSockeExample {
     public static void main(String[] args) throws IOException, ClassNotFoundException {
 
         // start server
-        var t1 = new Thread(() -> SecSockeExample.runServer(args));
+        var t1 = new Thread(() -> SecSocketExample.runServer(args));
         t1.start();
 
         // await listening of server (don't wait or sleep in your productive code)

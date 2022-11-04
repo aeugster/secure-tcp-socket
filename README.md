@@ -2,7 +2,7 @@
 Create secure connections without requirement of certificates and key stores.
 
 ## Usage
-- start ExampleServer and connect with SecSocketExample
+- Client & Server - start SecSocketExample and have a look at the log
 - Explore unitTest ExampleClientIT and connect to an existing server
 
 ## Issues and Sonar
@@ -10,15 +10,20 @@ Issues: https://github.com/aeugster/secure-tcp-socket/issues
 
 Sonar: https://sonarcloud.io/summary/overall?id=aeugster_secure-tcp-socket
 
+[![Coverage](https://sonarcloud.io/api/project_badges/measure?project=aeugster_secure-tcp-socket&metric=coverage)](https://sonarcloud.io/summary/new_code?id=aeugster_secure-tcp-socket)
+[![Lines of Code](https://sonarcloud.io/api/project_badges/measure?project=aeugster_secure-tcp-socket&metric=ncloc)](https://sonarcloud.io/summary/new_code?id=aeugster_secure-tcp-socket)
+[![Vulnerabilities](https://sonarcloud.io/api/project_badges/measure?project=aeugster_secure-tcp-socket&metric=vulnerabilities)](https://sonarcloud.io/summary/new_code?id=aeugster_secure-tcp-socket)
+
 ## Exceptions
-- TechnicalExceptions are thrown for unexpected errors
-- ApplicationExceptions are kind of expected
+- TechnicalException is thrown for unexpected errors
+- ApplicationException is kind of expected
 
 
 ## Misc
 
 ### Trigger sonar manually (login required)
-https://sonarcloud.io/project/analysis_method?id=aeugster_secure-tcp-socket
+- Use start workflow buttons
+- Don't change analysis method https://sonarcloud.io/project/analysis_method?id=aeugster_secure-tcp-socket
 
 ### Formatting
 - use intellij defaults

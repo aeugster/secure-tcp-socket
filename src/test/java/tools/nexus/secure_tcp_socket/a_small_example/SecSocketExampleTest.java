@@ -11,27 +11,26 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * OK, does work locally
  * OK, does crash locally if port used: "Address already in use: NET_Bind
- * tbd, on github.com
  */
-class SecSockeExampleTest {
+class SecSocketExampleTest {
 
     @Test
     void testSuccessfulEnding() throws IOException, ClassNotFoundException, InterruptedException {
 
         // act
-        SecSockeExample.main(null);
+        SecSocketExample.main(null);
 
         // assert listen
         assertThat(ExampleServer.isTestFlagDidListen()).isTrue();
 
         // assert receive
-        var message = SecSockeExample.getTestFlagReceivedMessage();
+        var message = SecSocketExample.getTestFlagReceivedMessage();
         assertThat(message.command).isEqualTo("list");
     }
 
     @Test
     void coverageInvalid() {
         Assertions.assertThrows(SecureSocketTechnicalException.class,
-                () -> SecSockeExample.runServer(new String[]{"-3"}));
+                () -> SecSocketExample.runServer(new String[]{"-3"}));
     }
 }

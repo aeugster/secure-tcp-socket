@@ -8,7 +8,7 @@ import tools.nexus.secure_tcp_socket.dto.Message;
 import java.io.IOException;
 import java.util.Map;
 
-import static tools.nexus.secure_tcp_socket.a_small_example.SecSockeExample.PORT;
+import static tools.nexus.secure_tcp_socket.a_small_example.SecSocketExample.PORT;
 
 /**
  * integration test against reference server
