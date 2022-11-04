@@ -177,6 +177,7 @@ class SecureTcpSocketTest {
         serverSideSocket.close();
     }
 
+    @SuppressWarnings("java:S3329") // IV's should be random and unique
     public static IvParameterSpec getInitVectorForTesting(String algorithm) {
         try {
             Cipher cipher = Cipher.getInstance(algorithm);
