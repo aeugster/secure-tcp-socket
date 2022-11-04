@@ -15,10 +15,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 class SecSocketExampleTest {
 
     @Test
-    void testSuccessfulEnding() throws IOException, ClassNotFoundException, InterruptedException {
+    void testSuccessfulEnding() throws IOException, ClassNotFoundException {
 
         // act
-        SecSocketExample.main(null);
+        SecSocketExample.main(new String[]{"p", "once"});
 
         // assert listen
         assertThat(ExampleServer.isTestFlagDidListen()).isTrue();
