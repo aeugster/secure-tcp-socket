@@ -18,7 +18,12 @@ public class SecSocketExample {
     /**
      * productive server port
      */
-    public static final int PORT = 1234;
+    public static final int PROD_PORT = 1234;
+
+    /**
+     * productive frist public key byte (please compare the whole key)
+     */
+    public static final byte PROD_FIRST_PUBLIC_KEY_BYTE = 48 ;
 
     public static final String SERVER = "localhost";
 
@@ -37,7 +42,7 @@ public class SecSocketExample {
         DeprecatedWaitUtil.waitMillis(1000, ExampleServer::isTestFlagDidListen);
 
         // create client and run it
-        var client = new ExampleClient(SERVER, PORT);
+        var client = new ExampleClient(SERVER, PROD_PORT, PROD_FIRST_PUBLIC_KEY_BYTE);
         client.connectToServer();
 
         // use connection

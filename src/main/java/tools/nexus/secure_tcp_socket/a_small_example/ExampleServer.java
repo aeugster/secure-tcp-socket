@@ -1,5 +1,6 @@
 package tools.nexus.secure_tcp_socket.a_small_example;
 
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import tools.nexus.secure_tcp_socket.FortNoxServer;
 import tools.nexus.secure_tcp_socket.common.ObjInputStream;
@@ -11,20 +12,19 @@ import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Expects a fixed serie of messages (because it's an example server)
  */
 @Slf4j
+@RequiredArgsConstructor
 public class ExampleServer {
 
     private static boolean testFlagDidListen;
 
     private final ServerSocket serverSocket;
-
-    public ExampleServer(ServerSocket serverSocket) {
-        this.serverSocket = serverSocket;
-    }
 
     private static boolean doWhile = true;
 
@@ -33,7 +33,7 @@ public class ExampleServer {
      */
     @SuppressWarnings("java:S2189") // no infinite loops
     public static void main(String[] args) throws IOException {
-        var port = SecSocketExample.PORT;
+        var port = SecSocketExample.PROD_PORT;
         var once = false;
 
         if (args != null) {
@@ -103,13 +103,16 @@ public class ExampleServer {
             log("Server reacting to: " + message.command);
 
             Message m = Message.createListRequest();
-            m.name = "helloWorld.txt, helloWorld.png, helloWorld.jpg";
+            m.obj = new HashMap<>();
+            ((Map) m.obj).put("helloWorld.txt", "file1");
+
             new ObjOutputStream(connectedClient.getOutputStream()).writeUnshared(m);
             log(m.command + " message sent");
         }
     }
 
-    @SuppressWarnings("java:S106") // avoid std out
+    // no std out
+    @SuppressWarnings("java:S106")
     void log(String str) {
         System.out.println(str);
     }

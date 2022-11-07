@@ -40,14 +40,19 @@ public class FortNoxClient {
     /**
      * Symmetric key algorithm
      */
-    public static final String SYMMETRIC_TYPE = "AES";
+    public static final String SYMMETRIC_ALGORITHM = "AES";
 
-    public static final String SYMMETRIC_ALGORITHM = "AES/CTR/NoPadding";
+    public static final String SYMMETRIC_TRANSFORMATION = "AES/CTR/NoPadding";
 
     public static final int SYMMETRIC_KEY_SIZE = 128;
 
     private byte[] publicKeyBytes;
 
+    /**
+     * Check whether right (non-fraud) public key was provided over the unsecure connection
+     *
+     * @return the actually used public key (which you have to check)
+     */
     public byte[] getPublicKeyBytes() {
         return publicKeyBytes;
     }
@@ -91,14 +96,14 @@ public class FortNoxClient {
             // Retrieve keys
             PublicKey publicKey = (PublicKey) inMessage.obj;
             publicKeyBytes = publicKey.getEncoded();
-            Key symmetricKey = generateSymmetricKey(SYMMETRIC_TYPE, SYMMETRIC_KEY_SIZE);
+            Key symmetricKey = generateSymmetricKey(SYMMETRIC_ALGORITHM, SYMMETRIC_KEY_SIZE);
 
             // Setup answer - key
             Message encryptedAwMessage = new Message(SecSocketMessageCmd.putEncSymKey);
             encryptedAwMessage.buffer = encrypt(symmetricKey.getEncoded(), publicKey);
 
             // add initVector (IvParameterSpec is not serializable)
-            IvParameterSpec initVector = SecureTcpSocket.getInitVector(SYMMETRIC_TYPE);
+            IvParameterSpec initVector = SecureTcpSocket.getInitVector(SYMMETRIC_ALGORITHM);
             encryptedAwMessage.obj = initVector.getIV();
 
             encryptedAwMessage.storedHash = encryptedAwMessage.hashCode();
@@ -117,7 +122,7 @@ public class FortNoxClient {
             int port = oldSocket.getPort();
             oldSocket.close();
 
-            var result = SecureTcpSocket.connect(host, port, SYMMETRIC_ALGORITHM, (SecretKey) symmetricKey, initVector);
+            var result = SecureTcpSocket.connect(host, port, SYMMETRIC_TRANSFORMATION, (SecretKey) symmetricKey, initVector);
             log.debug("setupSecureSocket2 DONE");
             return result;
 
@@ -136,16 +141,16 @@ public class FortNoxClient {
     }
 
     /**
-     * @param symType type required for testing purpose
+     * @param algorithm type required for testing purpose
      * @return the symmetric key
      */
-    static Key generateSymmetricKey(String symType, int symSize) throws NoSuchAlgorithmException {
-        KeyGenerator keyGenerator = KeyGenerator.getInstance(symType);
+    static Key generateSymmetricKey(String algorithm, int keySize) throws NoSuchAlgorithmException {
+        KeyGenerator keyGenerator = KeyGenerator.getInstance(algorithm);
 
         // If this key generator requires any random bytes, it will get them
         // using the SecureRandom implementation of the highest-priority
         // installed provider as the source of randomness.
-        keyGenerator.init(symSize);
+        keyGenerator.init(keySize);
 
         return keyGenerator.generateKey();
     }

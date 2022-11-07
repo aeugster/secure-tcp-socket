@@ -26,7 +26,7 @@ Sonar: https://sonarcloud.io/summary/overall?id=aeugster_secure-tcp-socket
 - Don't change analysis method https://sonarcloud.io/project/analysis_method?id=aeugster_secure-tcp-socket
 
 ### Formatting
-- use intellij defaults
+- use intellij defaults (e.g. spaces instead of tab)
 
 ### Commits
 https://github.com/aeugster/secure-tcp-socket/commits/main
