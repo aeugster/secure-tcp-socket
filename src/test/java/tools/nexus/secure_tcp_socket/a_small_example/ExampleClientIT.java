@@ -8,14 +8,13 @@ import tools.nexus.secure_tcp_socket.dto.Message;
 import java.io.IOException;
 import java.util.Map;
 
-import static tools.nexus.secure_tcp_socket.a_small_example.SecSocketExample.PORT;
-
 /**
  * integration test against reference server
  */
 class ExampleClientIT {
 
-    private static final String SERVER_INTEGRATION = "nexus.tools";
+    private static final String PROD_SERVER = "nexus.tools";
+    // private static final String PROD_SERVER = "localhost";
 
     /**
      * receive of listing
@@ -28,7 +27,7 @@ class ExampleClientIT {
     void testReceiveOfListing() throws IOException, ClassNotFoundException {
 
         // run client
-        var client = new ExampleClient(SERVER_INTEGRATION, PORT);
+        var client = new ExampleClient(PROD_SERVER, SecSocketExample.PROD_PORT, SecSocketExample.PROD_FIRST_PUBLIC_KEY_BYTE);
         client.connectToServer();
 
         // send message
