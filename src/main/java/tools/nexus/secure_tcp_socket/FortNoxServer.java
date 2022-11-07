@@ -59,7 +59,7 @@ public class FortNoxServer {
     public void action1sendPublicKey(SyncObjOutputStream trans, String keyPairLocation) {
         log.debug("Entering serverSendPublicKey1...");
 
-        PublicKey publicKey = null;
+        PublicKey publicKey;
 
         try {
             // Create or retrieve KeyPair
@@ -74,10 +74,9 @@ public class FortNoxServer {
             throw new SecureSocketTechnicalException(e.getMessage());
         }
 
-        // Send public key to client
-        // no hash?
         Message m = new Message(SecSocketMessageCmd.putPubK);
         m.obj = publicKey;
+        // no hashing, please check key on client side
 
         try {
             trans.writeObject(m);
@@ -121,7 +120,7 @@ public class FortNoxServer {
 
         try {
             byte[] decryptedSymKeyBytes = decrypt(encryptedSymKey, cautionPrivateKey);
-            SecretKey sk = new SecretKeySpec(decryptedSymKeyBytes, FortNoxClient.SYMMETRIC_TYPE);
+            SecretKey sk = new SecretKeySpec(decryptedSymKeyBytes, FortNoxClient.SYMMETRIC_ALGORITHM);
 
             String clientName = FortNoxServer.getClientIdentification(socket);
             log.info("PUT key in map for: '" + clientName + "'");
@@ -184,7 +183,7 @@ public class FortNoxServer {
     public Socket createSecureSocketViaIdentifierRemoveKey(Socket socket) {
         String clientIdentification = getClientIdentification(socket);
 
-        var result = SecureTcpSocket.of(socket, FortNoxClient.SYMMETRIC_ALGORITHM,
+        var result = SecureTcpSocket.of(socket, FortNoxClient.SYMMETRIC_TRANSFORMATION,
                 (SecretKey) HOLY_MAP_OF_KEYS.get(clientIdentification)[0],
                 new IvParameterSpec((byte[]) HOLY_MAP_OF_KEYS.get(clientIdentification)[1]));
 

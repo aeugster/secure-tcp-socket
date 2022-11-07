@@ -19,7 +19,6 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.security.NoSuchAlgorithmException;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -28,7 +27,7 @@ import java.util.stream.Stream;
  *
  * @author AndresE
  */
-class SecureTcpSocketTest {
+public class SecureTcpSocketTest {
 
     private static final String NONE = "none";
 
@@ -47,8 +46,8 @@ class SecureTcpSocketTest {
     /**
      * Parameters
      */
-    private String symmetricType;
     private String symmetricAlgorithm;
+    private String symmetricTransformation;
     private boolean skipIv;
 
     /**
@@ -68,13 +67,13 @@ class SecureTcpSocketTest {
     }
 
     private boolean isCipher() {
-        return !symmetricType.equals(NONE);
+        return !symmetricAlgorithm.equals(NONE);
     }
 
     // @BeforeEach would be too early because params come afterwards :-/
-    private void initAndSetup(String type, String algo, boolean skipIv) throws Exception {
-        this.symmetricType = type;
-        this.symmetricAlgorithm = algo;
+    private void initAndSetup(String algorithm, String algo, boolean skipIv) throws Exception {
+        this.symmetricAlgorithm = algorithm;
+        this.symmetricTransformation = algo;
         this.skipIv = skipIv;
 
         // setup
@@ -91,29 +90,29 @@ class SecureTcpSocketTest {
         }
     }
 
-    private void setupCipherSocket() throws NoSuchAlgorithmException, IOException {
-        SecretKey secKey = getSymmetricTestingKey(symmetricType, FortNoxClient.SYMMETRIC_KEY_SIZE);
+    private void setupCipherSocket() throws IOException {
+        SecretKey secKey = getSymmetricTestingKey(symmetricAlgorithm, FortNoxClient.SYMMETRIC_KEY_SIZE);
 
-        SecureTcpSocket aCypherSocket = SecureTcpSocket.of(clientSocket, symmetricAlgorithm, secKey,
-                getInitVectorForTesting(symmetricAlgorithm));
+        SecureTcpSocket aCypherSocket = SecureTcpSocket.of(clientSocket, symmetricTransformation, secKey,
+                getInitVectorForTesting(symmetricTransformation));
         aCypherSocket.skipIv(skipIv);
         input = aCypherSocket.getInputStream();
 
-        aCypherSocket = SecureTcpSocket.of(serverSideSocket, symmetricAlgorithm, secKey,
-                getInitVectorForTesting(symmetricAlgorithm));
+        aCypherSocket = SecureTcpSocket.of(serverSideSocket, symmetricTransformation, secKey,
+                getInitVectorForTesting(symmetricTransformation));
         aCypherSocket.skipIv(skipIv);
         output = aCypherSocket.getOutputStream();
     }
 
-    private SecretKey getSymmetricTestingKey(String symmetricType, int symmetricKeySize) {
+    public static SecretKey getSymmetricTestingKey(String algorithm, int symmetricKeySize) {
         if (symmetricKeySize != 128) {
             return null;
         }
 
         byte[] bytes;
 
-        switch (symmetricType) {
-            case "AES":
+        switch (algorithm) {
+            case "AES": // 16 byte & 128 bits
                 bytes = new byte[]{46, 58, 80, 29, -119, 50, -1, -86, 29, 114, -75, 44, -2, 69, 74, -77};
                 break;
             case "ARCFOUR":
@@ -126,7 +125,7 @@ class SecureTcpSocketTest {
                 return null;
         }
 
-        return new SecretKeySpec(bytes, symmetricType);
+        return new SecretKeySpec(bytes, algorithm);
     }
 
     private void setupBaseSocket() throws IOException {
@@ -137,8 +136,8 @@ class SecureTcpSocketTest {
     @ParameterizedTest
     @MethodSource("provideParameters")
     @Timeout(1)
-    void testTwoSingleBytes(String type, String algo, boolean skipIV) throws Exception {
-        initAndSetup(type, algo, skipIV);
+    void testTwoSingleBytes(String algorithm, String transformation, boolean skipIV) throws Exception {
+        initAndSetup(algorithm, transformation, skipIV);
 
         output.write("x".getBytes(StandardCharsets.UTF_8));
         output.write("y".getBytes(StandardCharsets.UTF_8));
@@ -152,8 +151,8 @@ class SecureTcpSocketTest {
     @ParameterizedTest
     @MethodSource("provideParameters")
     @Timeout(1)
-    void testSend10Bytes(String type, String algo, boolean skipIV) throws Exception {
-        initAndSetup(type, algo, skipIV);
+    void testSend10Bytes(String algorithm, String transformation, boolean skipIV) throws Exception {
+        initAndSetup(algorithm, transformation, skipIV);
 
         output.write(new byte[]{1, 2, 3, 4, 5, 6, 7, 8, 9, 10});
 
@@ -166,8 +165,8 @@ class SecureTcpSocketTest {
     @ParameterizedTest
     @MethodSource("provideParameters")
     @Timeout(2)
-    void testSend10kiloBytes(String type, String algo, boolean skipIV) throws Exception {
-        initAndSetup(type, algo, skipIV);
+    void testSend10kiloBytes(String algorithm, String transformation, boolean skipIV) throws Exception {
+        initAndSetup(algorithm, transformation, skipIV);
 
         int size = 10000;
         byte[] tmp = new byte[size];

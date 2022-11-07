@@ -1,9 +1,11 @@
 package tools.nexus.secure_tcp_socket.a_small_example;
 
+import lombok.RequiredArgsConstructor;
 import tools.nexus.secure_tcp_socket.FortNoxClient;
 import tools.nexus.secure_tcp_socket.common.ObjInputStream;
 import tools.nexus.secure_tcp_socket.common.SecureTcpSocket;
 import tools.nexus.secure_tcp_socket.common.SyncObjOutputStream;
+import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 
 import java.io.IOException;
 import java.net.Socket;
@@ -11,19 +13,16 @@ import java.net.Socket;
 /**
  * Example client
  */
+@RequiredArgsConstructor
 public class ExampleClient {
 
-    public final String server;
-    public final int port;
+    private final String server;
+    private final int port;
+    private final byte firstByte;
 
     private SecureTcpSocket secureTcpSocket;
     private SyncObjOutputStream output;
     private ObjInputStream input;
-
-    public ExampleClient(String server, int port) {
-        this.server = server;
-        this.port = port;
-    }
 
     public void connectToServer() throws IOException {
         SecureTcpSocket secureSocket;
@@ -34,6 +33,15 @@ public class ExampleClient {
              */
             var fnClient = new FortNoxClient();
             secureSocket = fnClient.action2setupSecureSocket(server, connectedServer, new SyncObjOutputStream(connectedServer.getOutputStream()));
+
+            /*
+             * compare provided key with (in your java code stored) expected key
+             * (please compare all bytes for productive code)
+             */
+            byte currentFirstByte = fnClient.getPublicKeyBytes()[0];
+            if (currentFirstByte != firstByte) {
+                throw new SecureSocketTechnicalException("Given key is " + currentFirstByte + " but it should be: " + firstByte);
+            }
         }
 
         secureTcpSocket = secureSocket;

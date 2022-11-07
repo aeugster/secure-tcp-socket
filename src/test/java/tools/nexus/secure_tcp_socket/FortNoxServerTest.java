@@ -16,7 +16,7 @@ class FortNoxServerTest {
 
     @Test
     void testGenerateSymmetricKey() throws NoSuchAlgorithmException {
-        Key symKey = FortNoxClient.generateSymmetricKey(FortNoxClient.SYMMETRIC_TYPE, FortNoxClient.SYMMETRIC_KEY_SIZE);
+        Key symKey = FortNoxClient.generateSymmetricKey(FortNoxClient.SYMMETRIC_ALGORITHM, FortNoxClient.SYMMETRIC_KEY_SIZE);
         Assertions.assertEquals("AES", symKey.getAlgorithm());
         Assertions.assertEquals(16 /* 128 */, symKey.getEncoded().length);
     }
