@@ -23,8 +23,8 @@ class ExampleClientIT {
      * - delete line where storedHash is updated and see how the server reacts
      */
     @Test
-    @Timeout(2)
-    void testReceiveOfListing() throws IOException, ClassNotFoundException {
+    @Timeout(3)
+    void testReceiveOfListing() throws IOException {
 
         // run client
         var client = new ExampleClient(PROD_SERVER, SecSocketExample.PROD_PORT, SecSocketExample.PROD_FIRST_PUBLIC_KEY_BYTE);

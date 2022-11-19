@@ -15,10 +15,8 @@ import javax.crypto.spec.IvParameterSpec;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.SocketException;
-import java.security.GeneralSecurityException;
-import java.security.Key;
-import java.security.NoSuchAlgorithmException;
-import java.security.PublicKey;
+import java.security.*;
+import java.security.spec.X509EncodedKeySpec;
 
 /**
  * FortNox - limited to Client features
@@ -93,8 +91,9 @@ public class FortNoxClient {
                 throw new SecureSocketTechnicalException("Received '" + inMessage.command + "' instead of " + SecSocketMessageCmd.putPubK);
             }
 
-            // Retrieve keys
-            PublicKey publicKey = (PublicKey) inMessage.obj;
+            // Retrieve key
+            var pubKeyBytes = (byte[]) inMessage.obj;
+            PublicKey publicKey = KeyFactory.getInstance("RSA").generatePublic(new X509EncodedKeySpec(pubKeyBytes));
             publicKeyBytes = publicKey.getEncoded();
             Key symmetricKey = generateSymmetricKey(SYMMETRIC_ALGORITHM, SYMMETRIC_KEY_SIZE);
 

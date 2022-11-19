@@ -75,7 +75,7 @@ public class FortNoxServer {
         }
 
         Message m = new Message(SecSocketMessageCmd.putPubK);
-        m.obj = publicKey;
+        m.obj = publicKey.getEncoded();
         // no hashing, please check key on client side
 
         try {

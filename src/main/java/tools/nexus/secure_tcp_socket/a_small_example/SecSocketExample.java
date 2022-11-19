@@ -23,7 +23,7 @@ public class SecSocketExample {
     /**
      * productive frist public key byte (please compare the whole key)
      */
-    public static final byte PROD_FIRST_PUBLIC_KEY_BYTE = 48 ;
+    public static final byte PROD_FIRST_PUBLIC_KEY_BYTE = 48;
 
     public static final String SERVER = "localhost";
 
@@ -32,7 +32,7 @@ public class SecSocketExample {
      */
     private static Message testFlagReceivedMessage;
 
-    public static void main(String[] args) throws IOException, ClassNotFoundException {
+    public static void main(String[] args) throws IOException {
 
         // start server
         var t1 = new Thread(() -> SecSocketExample.runServer(args));

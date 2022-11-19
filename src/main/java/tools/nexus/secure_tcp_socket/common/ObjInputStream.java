@@ -1,41 +1,43 @@
 package tools.nexus.secure_tcp_socket.common;
 
-import java.io.*;
-import java.util.HashSet;
-import java.util.Set;
+import com.google.gson.Gson;
+import com.google.gson.stream.JsonReader;
+import tools.nexus.secure_tcp_socket.dto.Message;
+import tools.nexus.secure_tcp_socket.dto.SecSocketMessageCmd;
 
-public class ObjInputStream extends ObjectInputStream {
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 
-    private final Set<String> allowedClasses;
+public class ObjInputStream {
+
+    private final Gson gson;
+    private final JsonReader jsonReader;
 
     public ObjInputStream(InputStream inputStream) throws IOException {
-        super(inputStream);
+        gson = new Gson();
 
-        allowedClasses = new HashSet<>();
-        allowedClasses.add("tools.nexus.secure_tcp_socket.dto.Message");
-
-        // ExampleClientIT
-        allowedClasses.add("java.security.KeyRep");
-        allowedClasses.add("[B");
-        allowedClasses.add("java.security.KeyRep$Type");
-        allowedClasses.add("java.lang.Enum");
-        allowedClasses.add("java.util.HashMap");
-
-        // file transfer
-        allowedClasses.add("java.lang.Long");
-        allowedClasses.add("java.lang.Number");
+        jsonReader = new JsonReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+        jsonReader.beginArray();
     }
 
-    /**
-     * Deserialization should not be vulnerable to injection attacks
-     */
-    @Override
-    protected Class<?> resolveClass(ObjectStreamClass osc) throws IOException, ClassNotFoundException {
-        // Only deserialize instances of AllowedClass
-        if (!allowedClasses.contains(osc.getName())) {
-            throw new InvalidClassException("Unauthorized deserialization", osc.getName());
+    public Object readUnshared() {
+        var changedMessage = (Message) gson.fromJson(jsonReader, Message.class);
+        return restoreMessage(changedMessage);
+    }
+
+    public void close() throws IOException {
+        jsonReader.close();
+    }
+
+    private Object restoreMessage(Message message) {
+        var cmd = message.command;
+
+        if (cmd.equals(SecSocketMessageCmd.putEncSymKey) || cmd.equals(SecSocketMessageCmd.putPubK)) {
+            message.obj = GsonUtil.objectToByteArray(message.obj);
         }
-        return super.resolveClass(osc);
-    }
 
+        return message;
+    }
 }
