@@ -7,7 +7,6 @@ import tools.nexus.secure_tcp_socket.common.ObjInputStream;
 import tools.nexus.secure_tcp_socket.common.ObjOutputStream;
 import tools.nexus.secure_tcp_socket.common.SyncObjOutputStream;
 import tools.nexus.secure_tcp_socket.dto.Message;
-import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -31,7 +30,7 @@ public class ExampleServer {
     /**
      * use for manual start
      */
-    @SuppressWarnings("java:S2189") // no infinite loops
+    @SuppressWarnings({"java:S2189", "java:S4507"}) // no infinite loops, no stack trace
     public static void main(String[] args) throws IOException {
         var port = SecSocketExample.PROD_PORT;
         var once = false;
@@ -58,7 +57,8 @@ public class ExampleServer {
             try {
                 server.runServer();
             } catch (Exception e) {
-                throw new SecureSocketTechnicalException(e.getMessage());
+                server.log("Restarting server loop because of: " + e.getMessage());
+                e.printStackTrace();
             }
         }
     }
@@ -67,7 +67,7 @@ public class ExampleServer {
         return testFlagDidListen;
     }
 
-    void runServer() throws IOException, ClassNotFoundException {
+    void runServer() throws IOException {
         log("\nWaiting for new client...");
 
         Socket connectedClient = serverSocket.accept();
@@ -95,7 +95,7 @@ public class ExampleServer {
     }
 
     @SuppressWarnings("java:S3329") // IV is dynamical
-    private void acceptAndSecureConnection(ServerSocket serverSocket, FortNoxServer fnServer) throws IOException, ClassNotFoundException {
+    private void acceptAndSecureConnection(ServerSocket serverSocket, FortNoxServer fnServer) throws IOException {
         try (Socket connectedClient = fnServer.createSecureSocketViaIdentifierRemoveKey(serverSocket.accept())) {
 
             // drop clients 'list'

@@ -9,6 +9,10 @@ import java.io.IOException;
 import static org.assertj.core.api.Assertions.assertThat;
 
 /**
+ * - starts the {@link ExampleServer}
+ * - tests whether server made it to state listen
+ * - validates client-received message
+ * <p>
  * OK, does work locally
  * OK, does crash locally if port used: "Address already in use: NET_Bind
  */
@@ -29,7 +33,7 @@ class SecSocketExampleTest {
     }
 
     @Test
-    void coverageInvalid() {
+    void coverageInvalidArguments() {
         Assertions.assertThrows(SecureSocketTechnicalException.class,
                 () -> SecSocketExample.runServer(new String[]{"-3"}));
     }

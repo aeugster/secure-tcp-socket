@@ -8,7 +8,7 @@ import java.io.OutputStream;
  */
 public class SyncObjOutputStream {
 
-	private ObjOutputStream stream;
+	private final ObjOutputStream stream;
 
 	public SyncObjOutputStream(OutputStream os) throws IOException {
 		stream = new ObjOutputStream(os);

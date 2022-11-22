@@ -5,6 +5,7 @@ import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
+import java.io.ObjectOutputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -50,7 +51,7 @@ public class FileSerializer<T> {
             }
 
             FileOutputStream fos = new FileOutputStream(pathToFile.toFile());
-            ObjOutputStream oos = new ObjOutputStream(fos);
+            ObjectOutputStream oos = new ObjectOutputStream(fos);
 
             oos.writeUnshared(obj);
             oos.close();
