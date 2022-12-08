@@ -32,25 +32,15 @@ public class ExampleServer {
      */
     @SuppressWarnings({"java:S2189", "java:S4507"}) // no infinite loops, no stack trace
     public static void main(String[] args) throws IOException {
-        var port = SecSocketExample.PROD_PORT;
-        var once = false;
 
-        if (args != null) {
-            if (args.length > 0 && !args[0].equals("p")) {
-                port = Integer.parseInt(args[0]);
-            }
-            if (args.length > 1 && args[1].equals("once")) {
-                once = true;
-            }
-        }
-
-        var serverSocket = new ServerSocket(port);
+        SecSocketArguments parsed = SecSocketArguments.parse(args);
+        var serverSocket = new ServerSocket(parsed.getPort());
 
         ExampleServer server = new ExampleServer(serverSocket);
         ExampleServer.testFlagDidListen = true;
 
         while (doWhile) {
-            if (once) {
+            if (parsed.isOnce()) {
                 doWhile = false;
             }
 
