@@ -22,7 +22,7 @@ class SecSocketExampleTest {
     void testSuccessfulEnding() throws IOException, ClassNotFoundException {
 
         // act
-        SecSocketExample.main(new String[]{"p", "once"});
+        SecSocketExample.main(new String[]{"8234", "once"});
 
         // assert listen
         assertThat(ExampleServer.isTestFlagDidListen()).isTrue();

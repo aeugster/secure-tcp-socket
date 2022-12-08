@@ -32,6 +32,9 @@ public class SecSocketExample {
      */
     private static Message testFlagReceivedMessage;
 
+    /**
+     * Arguments are parsed with {@link SecSocketArguments }
+     */
     public static void main(String[] args) throws IOException {
 
         // start server
@@ -41,8 +44,10 @@ public class SecSocketExample {
         // await listening of server (don't wait or sleep in your productive code)
         DeprecatedWaitUtil.waitMillis(1000, ExampleServer::isTestFlagDidListen);
 
+        SecSocketArguments parsed = SecSocketArguments.parse(args);
+
         // create client and run it
-        var client = new ExampleClient(SERVER, PROD_PORT, PROD_FIRST_PUBLIC_KEY_BYTE);
+        var client = new ExampleClient(SERVER, parsed.getPort(), PROD_FIRST_PUBLIC_KEY_BYTE);
         client.connectToServer();
 
         // use connection
