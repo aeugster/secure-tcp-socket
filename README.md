@@ -28,7 +28,9 @@ Sonar: https://sonarcloud.io/summary/overall?id=aeugster_secure-tcp-socket
 ### Formatting
 - use intellij defaults (e.g. spaces instead of tab)
 
-### Trips and tricks
+### Notes and tricks
+- Versioning does not really follow Major, Minor & Patch:
+  - a patch can contain breaking changes, but no features
 - show COMMITS on gui: click on the clock below the green [Code] button or use https://github.com/aeugster/secure-tcp-socket/commits/main
 
 ### Used code examples

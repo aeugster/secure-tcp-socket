@@ -92,11 +92,11 @@ public class FortNoxServer {
     static KeyPair generateKeyPairCached(String asymType, int asymKeySize, String keyPairLocation) throws NoSuchAlgorithmException {
 
         FileSerializer<KeyPair> fs = new FileSerializer<>(keyPairLocation);
-        KeyPair kp = fs.getObj();
+        KeyPair kp = fs.getObject();
 
         if (kp == null) {
             kp = generateKeyPair(asymType, asymKeySize);
-            fs.writeObj(kp);
+            fs.writeObject(kp);
         }
 
         return kp;

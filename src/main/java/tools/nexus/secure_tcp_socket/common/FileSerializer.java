@@ -2,21 +2,17 @@ package tools.nexus.secure_tcp_socket.common;
 
 import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 
-import java.io.BufferedInputStream;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-
 
 public class FileSerializer<T> {
 
     private final Path pathToFile;
 
     /**
-     * Generic class which does the serializing and the casts.
+     * Generic class which does the serializing and the casting
      */
     public FileSerializer(String file) {
         this.pathToFile = Paths.get(file);
@@ -25,26 +21,26 @@ public class FileSerializer<T> {
     /**
      * Read object from file system
      *
-     * @return null if some errors happened
+     * @return the object or null
      */
     @SuppressWarnings("unchecked")
-    public T getObj() {
+    public T getObject() {
 
-        try {
-            var bis = new BufferedInputStream(new FileInputStream(pathToFile.toFile()));
-            ObjInputStream ois = new ObjInputStream(bis);
+        try (var bis = new BufferedInputStream(new FileInputStream(pathToFile.toFile()));
+             ObjectInputStream ois = new ObjectInputStream(bis)) {
 
-            T result = (T) ois.readUnshared();
-            ois.close();
+            return (T) ois.readUnshared();
 
-            return result;
-        } catch (Exception e) {
-            // This class provides null on error
+        } catch (FileNotFoundException e) {
+            // ok
             return null;
+
+        } catch (IOException | ClassNotFoundException e) {
+            throw new SecureSocketTechnicalException("Reading of file failed: " + pathToFile, e);
         }
     }
 
-    public void writeObj(T obj) {
+    public void writeObject(T obj) {
         try {
             if (pathToFile.getParent() != null) {
                 Files.createDirectories(pathToFile.getParent());
@@ -55,7 +51,9 @@ public class FileSerializer<T> {
 
             oos.writeUnshared(obj);
             oos.close();
-        } catch (Exception e) {
+
+        } catch (IOException e) {
+            // includes FileNotFound
             throw new SecureSocketTechnicalException("Error while writeObj: " + pathToFile, e);
         }
     }
