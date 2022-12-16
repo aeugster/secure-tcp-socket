@@ -24,7 +24,7 @@ public class FileSerializer<T> {
      * @return the object or null
      */
     @SuppressWarnings("unchecked")
-    public T getObject() {
+    public T getObj() {
 
         try (var bis = new BufferedInputStream(new FileInputStream(pathToFile.toFile()));
              ObjectInputStream ois = new ObjectInputStream(bis)) {
@@ -40,7 +40,7 @@ public class FileSerializer<T> {
         }
     }
 
-    public void writeObject(T obj) {
+    public void writeObj(T obj) {
         try {
             if (pathToFile.getParent() != null) {
                 Files.createDirectories(pathToFile.getParent());
