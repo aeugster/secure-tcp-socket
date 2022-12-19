@@ -40,12 +40,21 @@ class ObjInputStreamTest {
 
     @Test
     void testJsonRestoreHandler() {
-        var m = new Message("xy");
-        m.obj = "123";
-        ConfigFacade.registerJsonHandler((obj, cmd) -> 456);
+        try {
+            // arrange
+            var m = new Message("xy");
+            m.obj = "123";
+            ConfigFacade.registerJsonHandler((obj, cmd) -> 456);
 
-        testee.restoreMessage(m);
+            // act
+            testee.restoreMessage(m);
 
-        assertThat((Integer) m.obj).isEqualTo(456);
+            // assert
+            assertThat((Integer) m.obj).isEqualTo(456);
+
+        } finally {
+            // clean-up
+            ConfigFacade.registerJsonHandler((o, c) -> null);
+        }
     }
 }

@@ -40,7 +40,7 @@ public class ObjInputStream {
         jsonReader.close();
     }
 
-    private void restoreMessage(Message message) {
+    void restoreMessage(Message message) {
         var cmd = message.command;
 
         Object newObject = jsonHandler.apply(message.obj, message.command);
