@@ -3,6 +3,7 @@ package tools.nexus.secure_tcp_socket.common;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import tools.nexus.secure_tcp_socket.dto.Message;
+import tools.nexus.secure_tcp_socket.exceptions.ConfigFacade;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -25,7 +26,7 @@ class ObjInputStreamTest {
     }
 
     @Test
-    void testConvert() {
+    void testReadMessage() {
 
         // assert I (magic string: putEncSymKey)
         var message = (Message) testee.readUnshared();
@@ -35,5 +36,16 @@ class ObjInputStreamTest {
         // assert II
         message = (Message) testee.readUnshared();
         assertThat(message.name).isEqualTo("blu456");
+    }
+
+    @Test
+    void testJsonRestoreHandler() {
+        var m = new Message("xy");
+        m.obj = "123";
+        ConfigFacade.registerJsonHandler((obj, cmd) -> 456);
+
+        testee.restoreMessage(m);
+
+        assertThat((Integer) m.obj).isEqualTo(456);
     }
 }
