@@ -9,8 +9,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.nio.charset.StandardCharsets;
+import java.util.function.BiFunction;
 
 public class ObjInputStream {
+
+    private static BiFunction<Object, String, Object> jsonHandler = (obj, cmd) -> null;
 
     private final Gson gson;
     private final JsonReader jsonReader;
@@ -22,22 +25,32 @@ public class ObjInputStream {
         jsonReader.beginArray();
     }
 
+    public static void registerJsonHandler(BiFunction<Object, String, Object> handler) {
+        jsonHandler = handler;
+    }
+
     public Object readUnshared() {
-        var changedMessage = (Message) gson.fromJson(jsonReader, Message.class);
-        return restoreMessage(changedMessage);
+        var parsedMessage = (Message) gson.fromJson(jsonReader, Message.class);
+        restoreMessage(parsedMessage);
+
+        return parsedMessage;
     }
 
     public void close() throws IOException {
         jsonReader.close();
     }
 
-    private Object restoreMessage(Message message) {
+    private void restoreMessage(Message message) {
         var cmd = message.command;
+
+        Object newObject = jsonHandler.apply(message.obj, message.command);
+        if (newObject != null) {
+            message.obj = newObject;
+            return;
+        }
 
         if (cmd.equals(SecSocketMessageCmd.putEncSymKey) || cmd.equals(SecSocketMessageCmd.putPubK)) {
             message.obj = GsonUtil.objectToByteArray(message.obj);
         }
-
-        return message;
     }
 }
