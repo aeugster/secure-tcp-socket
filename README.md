@@ -16,7 +16,7 @@ Sonar: https://sonarcloud.io/summary/overall?id=aeugster_secure-tcp-socket
 
 ## Exceptions
 - SecureSocket<b>TechnicalException</b> is thrown for unexpected errors
-- SecureSocket<b>ApplicationException</b> is kind of expected
+- SecureSocket<b>ApplicationException</b> is kind of expected. Currently, IOExceptions are used instead
 
 
 ## Misc
@@ -27,6 +27,15 @@ Sonar: https://sonarcloud.io/summary/overall?id=aeugster_secure-tcp-socket
 
 ### Formatting
 - use intellij defaults (e.g. spaces instead of tab)
+
+### Motivation
+The use of RestTemplate was not an option (since it relies on trusted certificates):
+- For 'lets encrypt' the server must be public
+- For private CA the JRE needs cert import
+- Long polls would be needed for information-push to the client
+
+Java SSLSocket was not an option (since it relies on trusted certificates):
+- JRE needs cert import
 
 ### Notes and tricks
 - Versioning follows java-defaults Major, Minor & Patch
