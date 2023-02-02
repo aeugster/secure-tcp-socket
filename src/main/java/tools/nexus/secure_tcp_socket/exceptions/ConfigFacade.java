@@ -6,6 +6,9 @@ import java.util.function.BiFunction;
 
 public class ConfigFacade {
 
+    private ConfigFacade() {
+    }
+
     public static void registerJsonHandler(BiFunction<Object, String, Object> handler) {
         ObjInputStream.registerJsonHandler(handler);
     }

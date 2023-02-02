@@ -35,7 +35,7 @@ The use of RestTemplate was not an option (since it relies on trusted certificat
 - Long polls would be needed for information-push to the client
 
 Java SSLSocket was not an option (since it relies on trusted certificates):
-- JRE needs cert import
+- Application needs a truststore with imported server certificate
 
 ### Notes and tricks
 - Versioning follows java-defaults Major, Minor & Patch
