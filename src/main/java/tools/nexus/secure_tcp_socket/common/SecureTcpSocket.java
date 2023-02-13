@@ -23,22 +23,28 @@ public class SecureTcpSocket extends Socket {
 
     private final String transformation;
     private final SecretKey key;
-    private final IvParameterSpec initVector;
+    private final IvParameterSpec dynamicInitVector;
     private boolean useIV = true;
 
     /**
      * 'Creates a stream socket and connects it to the specified port number on the named host'
+     *
+     * @param dynamicInitVector dynamically-generated IV
+     * @throws IOException
      */
-    public static SecureTcpSocket connect(String host, int port, String algorithm, SecretKey key, IvParameterSpec initVector) throws IOException {
-        return new SecureTcpSocket(host, port, algorithm, key, initVector);
+    public static SecureTcpSocket connect(String host, int port, String algorithm, SecretKey key, IvParameterSpec dynamicInitVector) throws IOException {
+        return new SecureTcpSocket(host, port, algorithm, key, dynamicInitVector);
     }
 
-    private SecureTcpSocket(String host, int port, String transformation, SecretKey key, IvParameterSpec initVector) throws IOException {
+    /**
+     * 'Connecting' constructor
+     */
+    private SecureTcpSocket(String host, int port, String transformation, SecretKey key, IvParameterSpec dynamicInitVector) throws IOException {
         super(host, port);
 
         this.transformation = transformation;
         this.key = key;
-        this.initVector = initVector;
+        this.dynamicInitVector = dynamicInitVector;
     }
 
     /**
@@ -48,12 +54,15 @@ public class SecureTcpSocket extends Socket {
         return new SecureTcpSocket(providedSocket, transformation, key, initVector);
     }
 
-    private SecureTcpSocket(Socket providedSocket, String transformation, SecretKey key, IvParameterSpec initVector) {
+    /**
+     * 'Providing' constructor
+     */
+    private SecureTcpSocket(Socket providedSocket, String transformation, SecretKey key, IvParameterSpec dynamicInitVector) {
         this.providedSocket = providedSocket;
 
         this.transformation = transformation;
         this.key = key;
-        this.initVector = initVector;
+        this.dynamicInitVector = dynamicInitVector;
     }
 
     public void skipIv(boolean skip) {
@@ -71,7 +80,7 @@ public class SecureTcpSocket extends Socket {
         try {
             cipher = Cipher.getInstance(transformation);
             if (useIV) {
-                cipher.init(Cipher.DECRYPT_MODE, key, initVector);
+                cipher.init(Cipher.DECRYPT_MODE, key, dynamicInitVector);
             } else {
                 cipher.init(Cipher.DECRYPT_MODE, key);
             }
@@ -86,14 +95,16 @@ public class SecureTcpSocket extends Socket {
     /**
      * get a stream for writing bytes to socket
      */
+    @SuppressWarnings("java:S6432") // use dyn-generated IV
     @Override
     public OutputStream getOutputStream() throws IOException {
         OutputStream os = providedSocket != null ? providedSocket.getOutputStream() : super.getOutputStream();
+
         Cipher cipher;
         try {
             cipher = Cipher.getInstance(transformation);
             if (useIV) {
-                cipher.init(Cipher.ENCRYPT_MODE, key, initVector);
+                cipher.init(Cipher.ENCRYPT_MODE, key, dynamicInitVector);
             } else {
                 cipher.init(Cipher.ENCRYPT_MODE, key);
             }
