@@ -13,11 +13,8 @@ class MessageTest {
     Message otherMessage = new Message("tbd");
     Message nonEqMessage = new Message("nonEq");
 
-    /**
-     * test created on Windows machine
-     */
     @Test
-    void testHashCode() {
+    void testHashCode_detectMessageChanges() {
         assertThat(testee.hashCode()).isEqualTo(-638242825);
 
         testee.name = "hello";

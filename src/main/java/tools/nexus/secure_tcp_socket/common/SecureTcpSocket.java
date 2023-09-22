@@ -13,6 +13,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.security.GeneralSecurityException;
 import java.security.SecureRandom;
+import java.security.spec.AlgorithmParameterSpec;
 
 /**
  * Encrypted socket for client and server use
@@ -23,14 +24,13 @@ public class SecureTcpSocket extends Socket {
 
     private final String transformation;
     private final SecretKey key;
-    private final IvParameterSpec dynamicInitVector;
+    private final AlgorithmParameterSpec dynamicInitVector;
     private boolean useIV = true;
 
     /**
      * 'Creates a stream socket and connects it to the specified port number on the named host'
      *
      * @param dynamicInitVector dynamically-generated IV
-     * @throws IOException
      */
     public static SecureTcpSocket connect(String host, int port, String algorithm, SecretKey key, IvParameterSpec dynamicInitVector) throws IOException {
         return new SecureTcpSocket(host, port, algorithm, key, dynamicInitVector);
@@ -50,14 +50,14 @@ public class SecureTcpSocket extends Socket {
     /**
      * Creates a {@link SecureTcpSocket} based on the provided socket
      */
-    public static SecureTcpSocket of(Socket providedSocket, String transformation, SecretKey key, IvParameterSpec initVector) {
+    public static SecureTcpSocket of(Socket providedSocket, String transformation, SecretKey key, AlgorithmParameterSpec initVector) {
         return new SecureTcpSocket(providedSocket, transformation, key, initVector);
     }
 
     /**
      * 'Providing' constructor
      */
-    private SecureTcpSocket(Socket providedSocket, String transformation, SecretKey key, IvParameterSpec dynamicInitVector) {
+    private SecureTcpSocket(Socket providedSocket, String transformation, SecretKey key, AlgorithmParameterSpec dynamicInitVector) {
         this.providedSocket = providedSocket;
 
         this.transformation = transformation;

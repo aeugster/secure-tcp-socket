@@ -11,6 +11,7 @@ import tools.nexus.secure_tcp_socket.exceptions.SecureSocketTechnicalException;
 
 import javax.crypto.Cipher;
 import javax.crypto.SecretKey;
+import javax.crypto.spec.GCMParameterSpec;
 import javax.crypto.spec.IvParameterSpec;
 import javax.crypto.spec.SecretKeySpec;
 import java.io.IOException;
@@ -19,6 +20,7 @@ import java.io.OutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.security.spec.AlgorithmParameterSpec;
 import java.util.Arrays;
 import java.util.stream.Stream;
 
@@ -61,6 +63,10 @@ public class SecureTcpSocketTest {
 
                 Arguments.of(NONE, NONE /*                     */, false /* skip IV */),
                 Arguments.of("AES", "AES/CTR/NoPadding" /*     */, false),
+
+                // WIP
+                Arguments.of("AES", "AES/GCM/NoPadding" /*     */, false),
+
                 Arguments.of("ARCFOUR", "ARCFOUR" /*           */, true),
                 Arguments.of("Blowfish", "Blowfish/CTR/NoPadding", false)
         );
@@ -201,13 +207,16 @@ public class SecureTcpSocketTest {
     }
 
     @SuppressWarnings("java:S3329") // IV's should be random and unique
-    public static IvParameterSpec getInitVectorForTesting(String algorithm) {
+    public static AlgorithmParameterSpec getInitVectorForTesting(String algorithm) {
         try {
             Cipher cipher = Cipher.getInstance(algorithm);
             int size = cipher.getBlockSize();
             byte[] tmp = new byte[size];
-
             Arrays.fill(tmp, (byte) 15);
+
+            if (algorithm.contains("GCM")) {
+                return new GCMParameterSpec(128, tmp);
+            }
             return new IvParameterSpec(tmp);
 
         } catch (Exception e) {
