@@ -13,11 +13,8 @@
 
     <properties>
         <!-- Dependency versions -->
-        <junit.jupiter.version>5.9.2</junit.jupiter.version>
-        <maven-surefire-plugin.version>2.22.2</maven-surefire-plugin.version>
-
-        <!-- Java 11 -->
-        <java.version>11</java.version>
+        <junit.jupiter.version>5.10.1</junit.jupiter.version>
+        <maven-surefire-plugin.version>3.3.0</maven-surefire-plugin.version>
 
         <!-- Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -47,14 +44,14 @@
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.4.6</version>
+            <version>1.5.18</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.26</version>
+            <version>1.18.36</version>
             <scope>provided</scope>
         </dependency>
 
