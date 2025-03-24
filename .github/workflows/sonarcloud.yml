@@ -1,3 +1,7 @@
+# sonarcloud.io
+# - Automatic Analysis - "Recommended"
+# - "Even better" analysis are available through SonarQube Cloud's CI-based analysis :-P
+
 name: SonarCloud
 on:
   workflow_dispatch:
