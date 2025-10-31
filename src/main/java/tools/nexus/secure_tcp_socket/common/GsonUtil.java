@@ -4,13 +4,13 @@ import java.util.List;
 
 /**
  * The gson library converts simple byte arrays to ArrayList of Doubles...
- * This lib either "bad" OR "can't guess the right type"
+ * This lib is either "bad" OR "can't guess the right type"
  * <p>
  * Bad:
  * - Presence of solutions like <a href="https://gist.github.com/orip/3635246">this class</a> might have a reason.
  * <p>
  * Can't guess:
- * - Deserialize a flied of type object is difficult.
+ * - Deserialize a field of type object is difficult.
  */
 class GsonUtil {
 
