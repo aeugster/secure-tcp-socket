@@ -1,5 +1,6 @@
 # secure-tcp-socket
 Create secure connections without requirement of certificates and key stores.
+Optimized for Java 21.
 
 ## Usage
 - Client & Server - start SecSocketExample and have a look at the log
