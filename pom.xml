@@ -5,7 +5,7 @@
 
     <groupId>tools.nexus</groupId>
     <artifactId>secure-tcp-socket</artifactId>
-    <version>1.0.3-SNAPSHOT</version>
+    <version>1.0.3</version>
     <packaging>jar</packaging>
 
     <name>Secure tcp socket</name>
@@ -15,7 +15,7 @@
         <!-- Dependency versions -->
         <junit.jupiter.version>5.10.1</junit.jupiter.version>
         <maven-surefire-plugin.version>3.3.0</maven-surefire-plugin.version>
-        <pluginversion.jacoco>0.8.11</pluginversion.jacoco>
+        <pluginversion.jacoco>0.8.14</pluginversion.jacoco>
 
         <!-- Encoding -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -31,14 +31,14 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>2.0.5</version>
+            <version>2.0.17</version>
         </dependency>
 
         <!-- JSON converting -->
         <dependency>
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
-            <version>2.10.1</version>
+            <version>2.13.2</version>
         </dependency>
 
         <!-- logging - implementation / PROVIDER -->
@@ -52,7 +52,7 @@
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
-            <version>1.18.36</version>
+            <version>1.18.42</version>
             <scope>provided</scope>
         </dependency>
 
@@ -72,20 +72,20 @@
         <dependency>
             <groupId>org.mockito</groupId>
             <artifactId>mockito-junit-jupiter</artifactId>
-            <version>5.7.0</version>
+            <version>5.17.0</version>
             <scope>test</scope>
         </dependency>
 
         <dependency>
             <groupId>org.mockito</groupId>
-            <artifactId>mockito-all</artifactId>
-            <version>1.10.19</version>
+            <artifactId>mockito-core</artifactId>
+            <version>5.17.0</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.assertj</groupId>
             <artifactId>assertj-core</artifactId>
-            <version>3.25.0</version>
+            <version>3.27.6</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
