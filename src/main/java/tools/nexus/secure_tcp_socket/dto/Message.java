@@ -57,7 +57,7 @@ public class Message implements Serializable {
 	}
 
 	/**
-	 * Hash with all fields
+	 * Hash with all fields (except storedHash)
 	 */
 	@Override
 	public int hashCode() {
@@ -79,7 +79,7 @@ public class Message implements Serializable {
 	}
 
 	/**
-	 * Equals wit all fields
+	 * Equals with all fields (except storedHash)
 	 */
 	@SuppressWarnings({"squid:S3776", "squid:S1126", "squid:S3973"})
 	// Cognitive Complexity, return boolean not with if-else, use curly braces or indentation
